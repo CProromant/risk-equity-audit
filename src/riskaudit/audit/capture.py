@@ -1,6 +1,10 @@
 from dataclasses import dataclass
 
+import numpy as np
 from numpy.typing import ArrayLike
+
+from riskaudit._config import SEED
+from riskaudit.audit._common import boot_ci, to_float, topk_mask, weights_or_ones
 
 
 @dataclass
@@ -50,4 +54,15 @@ def top_k_capture(
     CaptureResult
         ``value`` and its 95% weighted-bootstrap ``ci``.
     """
-    raise NotImplementedError
+    s = to_float(scores)
+    nd = to_float(need)
+    w = weights_or_ones(weights, s.shape[0])
+
+    def stat(idx: np.ndarray) -> float:
+        mask = topk_mask(s[idx], w[idx], k)
+        wn = w[idx] * nd[idx]
+        return float(wn[mask].sum() / wn.sum())
+
+    value = stat(np.arange(s.shape[0]))
+    ci = boot_ci(stat, s.shape[0], n_boot, SEED)
+    return CaptureResult(value, ci, k)

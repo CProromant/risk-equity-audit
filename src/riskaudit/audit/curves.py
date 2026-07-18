@@ -3,6 +3,8 @@ from dataclasses import dataclass
 import numpy as np
 from numpy.typing import ArrayLike
 
+from riskaudit.audit._common import to_float, weights_or_ones
+
 
 @dataclass
 class CurveResult:
@@ -45,4 +47,24 @@ def label_choice_curve(
     CurveResult
         Per-bin score percentile, mean need, and its 95% band.
     """
-    raise NotImplementedError
+    s = to_float(scores)
+    nd = to_float(need)
+    w = weights_or_ones(weights, s.shape[0])
+    order = np.argsort(s, kind="stable")
+    nd, w = nd[order], w[order]
+    cumw = np.cumsum(w)
+    edges = np.linspace(0, cumw[-1], bins + 1)
+    binof = np.clip(np.searchsorted(edges, cumw, side="left") - 1, 0, bins - 1)
+
+    pct, mean, lo, hi = (np.full(bins, np.nan) for _ in range(4))
+    for b in range(bins):
+        sel = binof == b
+        pct[b] = (b + 0.5) / bins * 100
+        if not sel.any():
+            continue
+        ww, nn = w[sel], nd[sel]
+        m = float(np.sum(ww * nn) / np.sum(ww))
+        var = float(np.sum(ww * (nn - m) ** 2) / np.sum(ww))
+        se = np.sqrt(var * np.sum(ww**2)) / np.sum(ww)
+        mean[b], lo[b], hi[b] = m, m - 1.96 * se, m + 1.96 * se
+    return CurveResult(pct, mean, lo, hi)

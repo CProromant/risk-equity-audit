@@ -1,14 +1,30 @@
 from collections.abc import Callable, Mapping, Sequence
 from dataclasses import dataclass
 
+import numpy as np
 import pandas as pd
 from numpy.typing import ArrayLike
+from sklearn.metrics import r2_score, roc_auc_score
+
+from riskaudit.audit._common import to_float, topk_mask, weights_or_ones
 
 
 @dataclass
 class AblationResult:
     global_delta: pd.DataFrame
     capture_delta: pd.DataFrame
+
+
+def _perf(y: np.ndarray, pred: np.ndarray, w: np.ndarray) -> float:
+    if np.isin(np.unique(y), [0, 1]).all():
+        return float(roc_auc_score(y, pred, sample_weight=w))
+    return float(r2_score(y, pred, sample_weight=w))
+
+
+def _capture(pred: np.ndarray, need: np.ndarray, w: np.ndarray, k: float) -> float:
+    mask = topk_mask(pred, w, k)
+    wn = w * need
+    return float(wn[mask].sum() / wn.sum())
 
 
 def ablation(
@@ -53,4 +69,20 @@ def ablation(
     AblationResult
         Per-group global and capture deltas.
     """
-    raise NotImplementedError
+    w = weights_or_ones(weights, len(X))
+    need = to_float(y)
+    full = fit_fn(X, y)
+    p0 = np.asarray(full.predict(X), dtype=float)
+    g0, c0 = _perf(np.asarray(y), p0, w), _capture(p0, need, w, k)
+
+    gd, cd = {}, {}
+    for name, cols in feature_groups.items():
+        xg = X.drop(columns=list(cols))
+        m = fit_fn(xg, y)
+        pg = np.asarray(m.predict(xg), dtype=float)
+        gd[name] = g0 - _perf(np.asarray(y), pg, w)
+        cd[name] = c0 - _capture(pg, need, w, k)
+    return AblationResult(
+        pd.DataFrame({"delta": gd}),
+        pd.DataFrame({"delta": cd}),
+    )

@@ -1,6 +1,10 @@
 from dataclasses import dataclass
 
+import numpy as np
 from numpy.typing import ArrayLike
+
+from riskaudit._config import SEED
+from riskaudit.audit._common import boot_ci, to_float, topk_mask, weights_or_ones, wmean
 
 
 @dataclass
@@ -9,6 +13,13 @@ class RTMResult:
     rtm_expected_drop: float
     rtm_share: float
     ci: tuple[float, float]
+
+
+def _wcorr(x: np.ndarray, y: np.ndarray, w: np.ndarray) -> float:
+    mx, my = wmean(x, w), wmean(y, w)
+    cov = np.sum(w * (x - mx) * (y - my))
+    denom = np.sqrt(np.sum(w * (x - mx) ** 2) * np.sum(w * (y - my) ** 2))
+    return float(cov / denom) if denom > 0 else np.nan
 
 
 def regression_to_mean(
@@ -52,4 +63,24 @@ def regression_to_mean(
     RTMResult
         Observed drop, RTM-expected drop, their ratio, and its 95% ``ci``.
     """
-    raise NotImplementedError
+    yt = to_float(y_t)
+    yt1 = to_float(y_t1)
+    s = to_float(scores_t)
+    w = weights_or_ones(weights, yt.shape[0])
+    mu = wmean(yt, w)
+
+    def stat(idx: np.ndarray) -> float:
+        m = topk_mask(s[idx], w[idx], k)
+        top_t = wmean(yt[idx][m], w[idx][m])
+        denom = top_t - wmean(yt1[idx][m], w[idx][m])
+        if abs(denom) < 1e-12:
+            return np.nan
+        rho = _wcorr(yt[idx], yt1[idx], w[idx])
+        return (1 - rho) * (top_t - wmean(yt[idx], w[idx])) / denom
+
+    top = topk_mask(s, w, k)
+    observed = wmean(yt[top], w[top]) - wmean(yt1[top], w[top])
+    rho = _wcorr(yt, yt1, w)
+    expected = (1 - rho) * (wmean(yt[top], w[top]) - mu)
+    ci = boot_ci(stat, yt.shape[0], n_boot, SEED)
+    return RTMResult(float(observed), float(expected), float(expected / observed), ci)
