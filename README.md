@@ -8,7 +8,7 @@
 ![python](https://img.shields.io/badge/python-%E2%89%A53.11-blue)
 ![license](https://img.shields.io/badge/license-MIT-green)
 
-> **Project status.** Active development, working toward release `v0.1.0`. Interfaces and findings below describe the target design; see [Roadmap](#roadmap--hoja-de-ruta) for what is implemented. Everything is being built phase by phase per [`PROTOCOL.md`](PROTOCOL.md) and [`PLAN.md`](PLAN.md).
+> **Project status.** Active development toward `v0.1.0`. The **`riskaudit` audit package is implemented and tested** (7 functions, design-based CIs, ~99% coverage) and the **MEPS data pipeline is built**; the full MEPS modeling run, the Synthea demo, and the Chile module are still in progress. See the [Roadmap](#roadmap--hoja-de-ruta). Built phase by phase per [`PROTOCOL.md`](PROTOCOL.md) and [`PLAN.md`](PLAN.md).
 
 *(Versión en español más abajo — [ir al español](#español).)*
 
@@ -37,7 +37,7 @@ This is **label-choice bias**. It is the same mechanism [Obermeyer et al. (2019,
 
 ## The `riskaudit` toolkit
 
-`riskaudit` does **not** train models or make predictions. It is an **auditor**: give it the scores a model assigned and an independent measure of real need, and it quantifies how much need the model leaves behind — with population weights and bootstrap confidence intervals.
+`riskaudit` does **not** train models or make predictions. It is an **auditor**: give it the scores a model assigned and an independent measure of real need, and it quantifies how much need the model leaves behind — with population weights and confidence intervals (a plain row bootstrap, or a design-based one over survey strata/PSUs).
 
 Because it works purely on scores and a need measure, `riskaudit` is **domain- and country-agnostic**: the same functions audit a hospital's readmission model, an insurer's cost model, or a ministry's triage algorithm. The MEPS mental-health study is one application that shows the mechanism is real, and the Chile module is a local motivation — neither is the tool's scope.
 
@@ -48,9 +48,10 @@ Because it works purely on scores and a need measure, `riskaudit` is **domain- a
 | `ablation(fit_fn, X, y, feature_groups, k, weights)` | If we remove a feature group and retrain, how much does *global performance* drop vs. how much does *capture of that group* collapse? |
 | `label_choice_curve(scores, need, weights, bins)` | Obermeyer-style curve: score percentile vs. observed mean need. |
 | `regression_to_mean(y_t, y_t1, scores_t, k, weights)` | How much of the top-*k* spending drop from year *t* to *t+1* is just regression to the mean? |
+| `incremental_lift(y_t1, y_pred, distress, scores, k, weights)` | **The contribution metric:** among people the model deprioritizes, do those with measured need generate *more future outcome than predicted* than the rest? Makes the argument non-circular. |
 | `audit_report(results, out_html)` | Bundles everything into a self-contained HTML report. |
 
-The headline result the audit is designed to surface: **removing all mental-health features barely changes a spend model's global AUC/R² — yet it collapses the model's capture of measured need.** That contrast, estimated on the whole weighted population, is the argument (not the small severe-untreated subgroup, which is reported descriptively only).
+**The core, non-circular result** the audit surfaces: among the people a spend model deprioritizes, those in measured distress go on to generate medical spending *above what the model predicted* — need it was blind to, measured in the model's own currency (not the distress score, so the finding isn't circular). A companion contrast: removing all mental-health features barely moves a spend model's global AUC/R², yet it collapses its capture of measured need. Both are estimated on the whole weighted population, not the small severe-untreated subgroup (reported descriptively only). *An early estimate on the MEPS panel gives a positive lift whose 95% CI excludes zero and survives design-based variance; the fully modeled result is Phase 2.*
 
 ---
 
@@ -85,11 +86,7 @@ print(f"Top-decile capture of need: {capture.value:.1%}")
 audit_report({"capture": capture, "curve": curve}, out_html="audit.html")
 ```
 
-To see the full pipeline without any real data, run the synthetic demo:
-
-```bash
-python demo/run_demo.py   # < 10 min, no PHI, produces demo_report.html
-```
+The audit API above runs today. The full synthetic end-to-end demo (`demo/run_demo.py`, Synthea, no PHI, < 10 min) lands in Phase 3.
 
 ---
 
@@ -97,7 +94,7 @@ python demo/run_demo.py   # < 10 min, no PHI, produces demo_report.html
 
 No data is stored in this repository. Only download scripts and checksums are versioned; everything under `data/` is git-ignored.
 
-- **Core — MEPS (AHRQ, U.S.):** HC-233 (2021), HC-243 (2022), HC-251 (2023), and **HC-244 (Panel 26 Longitudinal 2021–2022)** — free, no registration. See [`PROTOCOL.md`](PROTOCOL.md) §3 for exact files, weights, and codebook references.
+- **Core — MEPS (AHRQ, U.S.):** HC-233 (2021), HC-243 (2022), HC-251 (2023), **HC-244 (Panel 26 Longitudinal 2021–2022)**, plus **HC-231** (2021 Conditions) and **HC-229A** (2021 Prescribed Medicines) for the mental-health treatment proxy — free, no registration; downloaded with SHA-256 checksums. See [`PROTOCOL.md`](PROTOCOL.md) §3 for exact files, weights, and codebook references.
 - **Chile module:** ENS 2016-17 (MINSAL), ACHS-UC Mental Health Thermometer, GES waiting lists (Glosa 06), DEIS, SUSESO, CASEN 2022 — public aggregates.
 - **Synthetic (demo):** [Synthea](https://synthea.mitre.org/) — no real patients.
 
@@ -107,10 +104,10 @@ No data is stored in this repository. Only download scripts and checksums are ve
 
 Honesty about limits is a feature of this project, not a footnote:
 
-- **The severe untreated subgroup is small** (≈ 45 people in MEPS). It is reported **descriptively, with wide confidence intervals** — never modeled. The robust finding is the population-level mechanism, not an anecdote about invisible patients.
+- **The severe untreated subgroup is small** (~135 people have severe distress, K6 ≥ 13, in both panel years; the untreated subset is smaller still). It is reported **descriptively, with wide confidence intervals** — never modeled. The robust finding is the population-level mechanism, not an anecdote about invisible patients.
 - **"Need" is a normative choice.** Calling a model "biased" requires asserting which target is the legitimate measure of need. That judgment is stated and defended in `docs/methods.md`, not assumed.
 - **The Chile module is descriptive triangulation, not evidence.** No Chilean microdata links measured symptoms to individual spending (there is no "Chilean MEPS"). Chile *motivates* the problem and gives it local policy relevance; it does not validate the MEPS result.
-- **Survey design is respected throughout** — final results always use sample weights and design-based variance (subpopulation/domain estimation), never unweighted or naïvely filtered.
+- **Survey design is respected throughout** — final results always use sample weights and design-based variance (a stratified cluster bootstrap over VARSTR/VARPSU, with subpopulation/domain estimation), never unweighted or naïvely filtered.
 
 ---
 
@@ -118,10 +115,10 @@ Honesty about limits is a feature of this project, not a footnote:
 
 Built phase by phase (see [`PLAN.md`](PLAN.md) for task-level detail and acceptance criteria):
 
-- **Phase 0** — Scaffolding: package layout, CI, tooling.
-- **Phase 1** — MEPS ETL: verified data dictionary, cleaned panel.
-- **Phase 2** — Models + audit on MEPS.
-- **Phase 3** — Stable `riskaudit.audit` API (≥ 90% coverage) + Synthea demo.
+- **Phase 0** ✅ — Scaffolding: package layout, CI, tooling.
+- **Phase 1** ✅ — MEPS ETL: verified data dictionary, cleaned panel (6,741 persons).
+- **Phase 2** ◐ — Models + full audit on MEPS (treatment proxy + `features`/`models`, in progress).
+- **Phase 3** ◐ — `riskaudit.audit` API done (~99% coverage); Synthea demo pending.
 - **Phase 4** — Chile gap module.
 - **Phase 5** — Release `v0.1.0` (bilingual README, CHANGELOG, Zenodo DOI).
 
@@ -144,7 +141,7 @@ A citation with a Zenodo DOI will be added at release. For now, please cite the 
 
 `riskaudit` es una herramienta en Python que audita *cualquier* modelo de estratificación de riesgo en busca de **sesgo por elección de la etiqueta** (*label-choice bias*): el error sistemático que aparece cuando el modelo se entrena con un proxy equivocado de "necesidad" (típicamente el **gasto sanitario**) en lugar de la necesidad misma. El repositorio acompaña la herramienta con un estudio reproducible sobre datos de MEPS (EE.UU.) y un módulo descriptivo de la brecha en Chile.
 
-> **Estado del proyecto.** En desarrollo activo, avanzando hacia el release `v0.1.0`. Las interfaces y hallazgos que se describen abajo corresponden al diseño objetivo; ver la [hoja de ruta](#roadmap--hoja-de-ruta). Todo se construye por fases según [`PROTOCOL.md`](PROTOCOL.md) y [`PLAN.md`](PLAN.md).
+> **Estado del proyecto.** En desarrollo activo hacia `v0.1.0`. El **paquete de auditoría `riskaudit` está implementado y testeado** (7 funciones, IC de diseño, ~99% de cobertura) y el **pipeline de datos MEPS está construido**; el modelado MEPS completo, el demo Synthea y el módulo Chile siguen en curso. Ver la [hoja de ruta](#roadmap--hoja-de-ruta). Construido por fases según [`PROTOCOL.md`](PROTOCOL.md) y [`PLAN.md`](PLAN.md).
 
 ## Qué es esto
 
@@ -165,7 +162,7 @@ Esto es el **sesgo por elección de la etiqueta**. Es el mismo mecanismo que [Ob
 
 ## La herramienta `riskaudit`
 
-`riskaudit` **no** entrena modelos ni predice. Es un **auditor**: le das los puntajes que asignó un modelo y una medida independiente de necesidad real, y cuantifica cuánta necesidad el modelo deja fuera — con pesos poblacionales e intervalos de confianza por bootstrap.
+`riskaudit` **no** entrena modelos ni predice. Es un **auditor**: le das los puntajes que asignó un modelo y una medida independiente de necesidad real, y cuantifica cuánta necesidad el modelo deja fuera — con pesos poblacionales e intervalos de confianza (bootstrap de filas, o de diseño sobre estratos/PSU de la encuesta).
 
 Como trabaja solo con puntajes y una medida de necesidad, `riskaudit` es **agnóstico al dominio y al país**: las mismas funciones auditan el modelo de reingresos de un hospital, el de gasto de una aseguradora o el algoritmo de priorización de un ministerio. El estudio MEPS de salud mental es una aplicación que muestra que el mecanismo es real, y el módulo Chile es una motivación local — ninguno es el alcance de la herramienta.
 
@@ -176,22 +173,23 @@ Como trabaja solo con puntajes y una medida de necesidad, `riskaudit` es **agnó
 | `ablation` | Si quito un grupo de features y reentreno, ¿cuánto baja el *desempeño global* vs. cuánto se desploma la *captura* de ese grupo? |
 | `label_choice_curve` | Curva estilo Obermeyer: percentil de score vs. necesidad observada media. |
 | `regression_to_mean` | ¿Cuánto de la caída de gasto del top-*k* entre *t* y *t+1* es solo regresión a la media? |
+| `incremental_lift` | **La métrica-contribución:** entre los que el modelo deprioriza, ¿los que tienen necesidad medida generan *más desenlace futuro del predicho* que el resto? Hace no-circular el argumento. |
 | `audit_report` | Empaqueta todo en un informe HTML autocontenido. |
 
-El resultado central que la auditoría busca revelar: **quitar todas las features de salud mental casi no cambia el AUC/R² global de un modelo de gasto — pero hunde la captura de la necesidad medida.** Ese contraste, estimado sobre toda la población ponderada, es el argumento (no el pequeño subgrupo severo no tratado, que se reporta solo descriptivamente).
+**El resultado central y no-circular** que revela la auditoría: entre las personas que un modelo de gasto deprioriza, las que están en distrés medido terminan generando gasto médico *por encima de lo que el modelo predijo* — necesidad a la que fue ciego, medida en la moneda propia del modelo (no en el score de distrés, así que el hallazgo no es circular). Contraste acompañante: quitar todas las features de salud mental casi no mueve el AUC/R² global, pero hunde la captura de necesidad medida. Ambos se estiman sobre toda la población ponderada, no sobre el pequeño subgrupo severo no tratado (que se reporta solo descriptivamente). *Una estimación preliminar en el panel MEPS da un lift positivo cuyo IC 95% excluye el cero y aguanta la varianza de diseño; el resultado con el modelo completo es la Fase 2.*
 
 ## Instalación y quickstart
 
-Igual que en la sección en inglés (Python ≥ 3.11, `pip install -e ".[dev]"`). El ejemplo mínimo de la API y el demo (`python demo/run_demo.py`) están arriba.
+Igual que en la sección en inglés (Python ≥ 3.11, `pip install -e ".[dev]"`). El ejemplo mínimo de la API funciona hoy; el demo Synthea (`demo/run_demo.py`) llega en la Fase 3.
 
 ## Limitaciones
 
 La honestidad sobre los límites es parte del proyecto, no una nota al pie:
 
-- **El subgrupo severo no tratado es pequeño** (≈ 45 personas en MEPS): se reporta **descriptivamente, con IC anchos**, nunca se modela. El hallazgo robusto es el mecanismo poblacional, no la anécdota de "los invisibles".
+- **El subgrupo severo no tratado es pequeño** (~135 personas con distrés severo, K6 ≥ 13, en ambos años del panel; el subgrupo *sin tratamiento* es aún menor): se reporta **descriptivamente, con IC anchos**, nunca se modela. El hallazgo robusto es el mecanismo poblacional, no la anécdota de "los invisibles".
 - **"Necesidad" es una elección normativa.** Llamar "sesgado" a un modelo exige afirmar cuál es la vara legítima de necesidad. Ese juicio se declara y defiende en `docs/methods.md`.
 - **El módulo Chile es triangulación descriptiva, no evidencia.** No hay microdato chileno que vincule síntomas medidos con gasto individual (no existe un "MEPS chileno"). Chile *motiva* el problema y le da relevancia local; no valida el resultado de MEPS.
-- **El diseño muestral se respeta siempre:** los resultados finales usan pesos y varianza basada en el diseño (estimación de subpoblación/dominio).
+- **El diseño muestral se respeta siempre:** los resultados finales usan pesos y varianza basada en el diseño (bootstrap de clúster estratificado sobre VARSTR/VARPSU, con estimación de subpoblación/dominio).
 
 ## Licencia
 
