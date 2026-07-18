@@ -1,31 +1,94 @@
 # MEPS variable dictionary — the only place raw MEPS names live (PROTOCOL §4.1).
-# Every variable is verified against the codebook before use (guardrail 1):
-#   standard_name:
-#     meps: <raw MEPS name>
-#     file: <HC-233 | HC-243 | HC-244 | HC-251>
-#     codebook: <section or page reference>
-#     note: <optional>
 #
-# Populated in Phase 1. Entries below are placeholders to be verified, not used.
+# Every name below was read from the .dta files' own embedded variable labels on
+# 2026-07-18 (pyreadstat metadata), i.e. verified against the codebook rather than
+# guessed (guardrail 1). `label` is that embedded label, the codebook reference.
+#
+# HC-244 (Panel 26) year map, confirmed from labels:
+#   Y1 = 2021 (SAQ administered in round 2), Y2 = 2022 (SAQ in round 4).
+# MEPS reserved missing codes {-1,-7,-8,-9,-15} are turned into NaN in meps.py,
+# except for ids, weights, stratum and PSU.
 
-design:
-  person_id:
-    meps: DUPERSID
-    file: HC-244
-    codebook: TBD
-  stratum:
-    meps: VARSTR
-    file: HC-244
-    codebook: TBD
-  psu:
-    meps: VARPSU
-    file: HC-244
-    codebook: TBD
-  weight_longitudinal:
-    meps: LONGWT
-    file: HC-244
-    codebook: TBD
-  weight_saq_longitudinal:
-    meps: LSAQWT
-    file: HC-244
-    codebook: TBD
+panel26:                          # source: HC-244 (one row per Panel 26 person)
+  design:
+    person_id:        {name: DUPERSID, label: "Person id"}
+    panel:            {name: PANEL,    label: "Panel number"}
+    stratum:          {name: VARSTR,   label: "Variance estimation stratum"}
+    psu:              {name: VARPSU,   label: "Variance estimation PSU"}
+    weight_long:      {name: LONGWT,   label: "Longitudinal weight - Panel 26"}
+    weight_saq_long:  {name: LSAQWT,   label: "Longitudinal SAQ weight - Panel 26"}
+    sex:              {name: SEX,      label: "Sex"}
+    race_eth:         {name: RACETHX,  label: "Race/ethnicity"}
+  t:                              # 2021
+    age_t:            {name: AGEY1X,   label: "Age as of 12/31/21 (edited/imputed)"}
+    region_t:         {name: REGIONY1, label: "Census region, year 1"}
+    poverty_t:        {name: POVCATY1, label: "Family poverty category, year 1"}
+    insurance_t:      {name: INSCOVY1, label: "Insurance coverage, year 1"}
+    k6_t:             {name: K6SUM2,   label: "SAQ K6 nonspecific distress (30 days), round 2"}
+    phq2_t:           {name: PHQ22,    label: "SAQ PHQ-2 (2 weeks), round 2"}
+    totexp_t:         {name: TOTEXPY1, label: "Total health care expenditure, 2021"}
+    totslf_t:         {name: TOTSLFY1, label: "Total paid self/family, 2021"}
+    er_t:             {name: ERTOTY1,  label: "ER visits, year 1"}
+    ip_disch_t:       {name: IPDISY1,  label: "Inpatient discharges, year 1"}
+    office_visits_t:  {name: OBTOTVY1, label: "Office-based visits, year 1"}
+    rx_t:             {name: RXTOTY1,  label: "Prescription fills, year 1"}
+    htn_t:            {name: HIBPDXY1,     label: "Ever told high blood pressure, year 1"}
+    chd_t:            {name: CHDDXY1,      label: "Ever told coronary heart disease, year 1"}
+    other_heart_t:    {name: OHRTDXY1,     label: "Ever told other heart disease, year 1"}
+    stroke_t:         {name: STRKDXY1,     label: "Ever told stroke, year 1"}
+    emphysema_t:      {name: EMPHDXY1,     label: "Ever told emphysema, year 1"}
+    high_chol_t:      {name: CHOLDXY1,     label: "Ever told high cholesterol, year 1"}
+    diabetes_t:       {name: DIABDXY1_M18, label: "Ever told diabetes (adults 18+), year 1"}
+    arthritis_t:      {name: ARTHDXY1,     label: "Ever told arthritis, year 1"}
+    asthma_t:         {name: ASTHDXY1,     label: "Ever told asthma, year 1"}
+    cancer_t:         {name: CANCERY1,     label: "Ever told cancer, year 1"}
+  t1:                             # 2022
+    age_t1:           {name: AGEY2X,   label: "Age as of 12/31/22 (edited/imputed)"}
+    k6_t1:            {name: K6SUM4,   label: "SAQ K6 nonspecific distress (30 days), round 4"}
+    phq2_t1:          {name: PHQ24,    label: "SAQ PHQ-2 (2 weeks), round 4"}
+    totexp_t1:        {name: TOTEXPY2, label: "Total health care expenditure, 2022"}
+    totslf_t1:        {name: TOTSLFY2, label: "Total paid self/family, 2022"}
+    er_t1:            {name: ERTOTY2,  label: "ER visits, year 2"}
+    ip_disch_t1:      {name: IPDISY2,  label: "Inpatient discharges, year 2"}
+    office_visits_t1: {name: OBTOTVY2, label: "Office-based visits, year 2"}
+    rx_t1:            {name: RXTOTY2,  label: "Prescription fills, year 2"}
+
+fyc:                              # sources: HC-233 (2021), HC-243 (2022), HC-251 (2023)
+  sources: {2021: h233, 2022: h243, 2023: h251}
+  fixed:                          # same name across years
+    person_id:  {name: DUPERSID, label: "Person id"}
+    panel:      {name: PANEL,    label: "Panel number"}
+    stratum:    {name: VARSTR,   label: "Variance estimation stratum"}
+    psu:        {name: VARPSU,   label: "Variance estimation PSU"}
+    sex:        {name: SEX,      label: "Sex"}
+    race_eth:   {name: RACETHX,  label: "Race/ethnicity"}
+    age_last:   {name: AGELAST,  label: "Age last recorded"}
+    k6:         {name: K6SUM42,  label: "SAQ K6 nonspecific distress (30 days)"}
+    phq2:       {name: PHQ242,   label: "SAQ PHQ-2 (2 weeks)"}
+    htn:        {name: HIBPDX,   label: "Ever told high blood pressure"}
+    diabetes:   {name: DIABDX_M18, label: "Ever told diabetes (adults 18+)"}
+    chd:        {name: CHDDX,    label: "Ever told coronary heart disease"}
+    other_heart: {name: OHRTDX,  label: "Ever told other heart disease"}
+    stroke:     {name: STRKDX,   label: "Ever told stroke"}
+    emphysema:  {name: EMPHDX,   label: "Ever told emphysema"}
+    high_chol:  {name: CHOLDX,   label: "Ever told high cholesterol"}
+    arthritis:  {name: ARTHDX,   label: "Ever told arthritis"}
+    asthma:     {name: ASTHDX,   label: "Ever told asthma"}
+    cancer:     {name: CANCERDX, label: "Ever told cancer"}
+  suffix:                         # {yy} -> 21 / 22 / 23
+    weight_fy:      {name: "PERWT{yy}F",  label: "Full-year person weight"}
+    weight_saq:     {name: "SAQWT{yy}F",  label: "SAQ person weight"}
+    age_x:          {name: "AGE{yy}X",    label: "Age at year end (edited/imputed)"}
+    region:         {name: "REGION{yy}",  label: "Census region"}
+    poverty:        {name: "POVCAT{yy}",  label: "Family poverty category"}
+    insurance:      {name: "INSCOV{yy}",  label: "Insurance coverage"}
+    totexp:         {name: "TOTEXP{yy}",  label: "Total health care expenditure"}
+    totslf:         {name: "TOTSLF{yy}",  label: "Total paid self/family"}
+    er:             {name: "ERTOT{yy}",   label: "ER visits"}
+    ip_disch:       {name: "IPDIS{yy}",   label: "Inpatient discharges"}
+    office_visits:  {name: "OBTOTV{yy}",  label: "Office-based visits"}
+    rx:             {name: "RXTOT{yy}",   label: "Prescription fills"}
+
+# Deferred (guardrail 1): the "untreated mental health" flag needs a treatment
+# proxy (mental-health visits / MH expenditure), which lives in the event/condition
+# files, not here. Operationalized in docs/methods.md before Phase 2 uses it.
