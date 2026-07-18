@@ -7,7 +7,9 @@ import requests
 
 from riskaudit._config import DATA_DIR, RAW_DIR
 
-PUF_IDS = ("h233", "h243", "h244", "h251")
+# Core FYC + Panel 26 (Phase 1). Conditions (h231) and Prescribed Medicines
+# (h229a), both 2021, feed the mental-health treatment proxy (Phase 2).
+PUF_IDS = ("h233", "h243", "h244", "h251", "h231", "h229a")
 URL_TEMPLATE = "https://meps.ahrq.gov/mepsweb/data_files/pufs/{id}/{id}dta.zip"
 CHECKSUMS = DATA_DIR / "checksums.txt"
 
