@@ -33,6 +33,8 @@
 ## 2. Decisiones abiertas a resolver [DECISIÓN]
 
 > Estas deben quedar resueltas y registradas en `docs/decisions.md`. Las que afectan el modelado (D2, D3, D4) **bloquean la Fase 2**, no la Fase 0/1. Doy recomendación en cada una.
+>
+> **Estado (2026-07-18): D1–D5 RESUELTAS** y registradas en `docs/decisions.md` (detalle matemático en `docs/methods.md`). D2=equidad como argumento central; contribución = `incremental_lift`; D3=tuning por target; D4=estimación de dominio; D5=K6 continuo + umbral. D6 sin cambios. Las casillas de abajo quedan como referencia histórica.
 
 - [ ] **D1 — Nombre y ubicación del protocolo.** El protocolo asume llamarse `PROTOCOL.md`; hoy es `PROTOCOLO_risk-equity-audit.md`. **Recomendación:** renombrar a `PROTOCOL.md` y crear `CLAUDE.md` mínimo (ver Fase 0, tarea 0.1). *No bloquea nada, pero conviene cerrarlo primero.*
 - [ ] **D2 — El juicio normativo: ¿cuál es el label "correcto"?** Llamar "sesgado" a un modelo exige afirmar cuál es la vara de necesidad legítima. **Recomendación:** el label defendible NO es "K6 en abstracto", sino **gasto/utilización futura del grupo con distrés medido** (la tesis: distrés no tratado → gasto no psiquiátrico en t+1). K6 se usa como *definición del grupo* y como uno de los targets de comparación, no como "la verdad" única. Documentar esta postura explícitamente en `docs/methods.md` **antes** de correr la auditoría. *(Deriva de la crítica: sin esto, un revisor marca el argumento como circular.)*
@@ -325,12 +327,13 @@ Para cada función: firma estable, docstring con **definición matemática exact
 
 ## 5. Checklist maestro de AC (una vista)
 
-- [ ] F0: `pip install -e ".[dev]"` ok · `pytest` verde · CI verde · pre-commit activo
-- [ ] F1: N panel ≈ 5.700 documentado · `dictionary.yml` con refs · tests esquema/rango · perfilado en `artifacts/`
+- [x] F0: `pip install -e ".[dev]"` ok · `pytest` verde · pre-commit activo · CI (confirmar verde en Actions)
+- [x] F1: N panel = 6.741 (3.001 adultos K6 ambos años) documentado · `dictionary.yml` verificado · tests esquema/rango · perfilado en `artifacts/`
 - [ ] F2: `make models && make audit` reproducible · informe con las 5 piezas · todo ponderado · severo solo descriptivo
-- [ ] F3: cobertura `audit` ≥ 90% · demo < 10 min en entorno nuevo · README con ejemplo de API
+- [~] F3: **`audit/` implementado** (6 funciones, 17 tests, cobertura 99%) · falta demo Synthea + ejemplo de API en README
 - [ ] F4: `make chile` → 4 figuras + tabla con fuentes · `methods.md` explica la triangulación
 - [ ] F5: README bilingüe completo · CHANGELOG · tag `v0.1.0` · Zenodo/cita · backlog en issues
+- [ ] Transversal: métrica `incremental_lift` (contribución propia, `methods.md` §2) · **bootstrap de diseño VARSTR/VARPSU** para IC publicables (hoy el paquete usa bootstrap simple)
 
 ---
 

@@ -39,6 +39,8 @@ This is **label-choice bias**. It is the same mechanism [Obermeyer et al. (2019,
 
 `riskaudit` does **not** train models or make predictions. It is an **auditor**: give it the scores a model assigned and an independent measure of real need, and it quantifies how much need the model leaves behind — with population weights and bootstrap confidence intervals.
 
+Because it works purely on scores and a need measure, `riskaudit` is **domain- and country-agnostic**: the same functions audit a hospital's readmission model, an insurer's cost model, or a ministry's triage algorithm. The MEPS mental-health study is one application that shows the mechanism is real, and the Chile module is a local motivation — neither is the tool's scope.
+
 | Function | Question it answers |
 |---|---|
 | `top_k_capture(scores, need, k, weights)` | Of all real need in the population, what fraction lands in the top-*k* the model prioritizes? |
@@ -164,6 +166,8 @@ Esto es el **sesgo por elección de la etiqueta**. Es el mismo mecanismo que [Ob
 ## La herramienta `riskaudit`
 
 `riskaudit` **no** entrena modelos ni predice. Es un **auditor**: le das los puntajes que asignó un modelo y una medida independiente de necesidad real, y cuantifica cuánta necesidad el modelo deja fuera — con pesos poblacionales e intervalos de confianza por bootstrap.
+
+Como trabaja solo con puntajes y una medida de necesidad, `riskaudit` es **agnóstico al dominio y al país**: las mismas funciones auditan el modelo de reingresos de un hospital, el de gasto de una aseguradora o el algoritmo de priorización de un ministerio. El estudio MEPS de salud mental es una aplicación que muestra que el mecanismo es real, y el módulo Chile es una motivación local — ninguno es el alcance de la herramienta.
 
 | Función | Pregunta que responde |
 |---|---|

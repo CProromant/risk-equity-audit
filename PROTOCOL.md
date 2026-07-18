@@ -34,7 +34,7 @@
 | Lectura de PUFs | descargar formato Stata (`.dta`) y leer con `pyreadstat` |
 | ML | LightGBM (API sklearn); scikit-learn para CV y calibración |
 | Explicabilidad | `shap` |
-| Diseño muestral | pesos SIEMPRE en resultados finales (`LONGWT`, `LSAQWT`, `PERWT*`, `SAQWT*`); varianza con VARSTR/VARPSU (linearización de Taylor vía `samplics` o `statsmodels`; documentar el método en `docs/methods.md`) |
+| Diseño muestral | pesos SIEMPRE en resultados finales (`LONGWT`, `LSAQWT`, `PERWT*`, `SAQWT*`); varianza basada en el diseño sobre VARSTR/VARPSU (bootstrap de diseño —remuestreo de PSU dentro de estratos— o linearización de Taylor); método documentado en `docs/methods.md` |
 | Tests | pytest; cobertura mínima de `riskaudit.audit`: 90% |
 | Calidad | ruff (lint + format) + pre-commit |
 | CI | GitHub Actions: lint + tests en Python 3.11 y 3.12 |
@@ -100,6 +100,8 @@ risk-equity-audit/
 | **HC-243** | Full-Year Consolidated 2022 | https://meps.ahrq.gov/data_stats/download_data/pufs/h243/h243doc.pdf |
 | **HC-251** | Full-Year Consolidated 2023 (publicado ago-2025) | https://meps.ahrq.gov/data_stats/download_data/pufs/h251/h251doc.shtml |
 | **HC-244** | **Panel 26 Longitudinal 2021–2022** (2.737 variables; el archivo central de la tesis; incluye `LONGWT` y el peso longitudinal del SAQ `LSAQWT`) | https://www.meps.ahrq.gov/mepsweb/data_stats/download_data/pufs/h244/h244doc.pdf |
+| **HC-231** | 2021 Medical Conditions (`ICD10CDX`, `CCSR1X-3X`); define el proxy de tratamiento de salud mental | https://meps.ahrq.gov/data_stats/download_data/pufs/h231/h231doc.shtml |
+| **HC-229A** | 2021 Prescribed Medicines (clase terapéutica Multum `TC1*`); psicofármacos para el proxy de tratamiento | https://meps.ahrq.gov/data_stats/download_data/pufs/h229a/h229adoc.shtml |
 
 - Patrón de descarga de datos (formato Stata): `https://meps.ahrq.gov/mepsweb/data_files/pufs/{id}/{id}dta.zip` con `{id}` ∈ {h233, h243, h244, h251}. **Si un URL da 404, obtener el enlace desde la página de detalle del PUF; no adivinar.**
 - Código de ejemplo oficial (R/SAS/Stata, incluye cómo cargar cada archivo): https://github.com/HHS-AHRQ/MEPS — usarlo como referencia de lectura y de nombres de variables.
@@ -161,7 +163,7 @@ Matriz `X_t` (todo medido en t=2021) + tres targets en t+1=2022:
 
 ### 4.3 `riskaudit.models`
 
-- Mismo estimador (LGBMRegressor / LGBMClassifier) e **hiperparámetros idénticos** para los tres targets; tuning ligero con CV 5-fold en train, congelar y aplicar igual a todos.
+- Mismo estimador (LGBMRegressor / LGBMClassifier) y **mismas features** para los tres targets (eso da la comparabilidad); **HP tuneados ligeramente por target** con la misma rutina CV 5-fold, luego congelados. (D3 resuelta; ver `docs/decisions.md` y `docs/methods.md` §4.)
 - Split: aleatorio 80/20 estratificado por decil de gasto_t (la validación temporal ya está implícita en el diseño features t → outcome t+1).
 - Persistir en `artifacts/`: modelos, predicciones out-of-fold y de test, métricas (`metrics.json`), importancias SHAP.
 
@@ -184,11 +186,16 @@ label_choice_curve(scores, need, weights=None, bins=20) -> CurveResult
 regression_to_mean(y_t, y_t1, scores_t, k=0.10, weights=None) -> RTMResult
 # Qué fracción de la caída de gasto del top-k entre t y t+1 es atribuible a RTM.
 
+incremental_lift(y_t1, y_pred, distress, scores, k=0.10, weights=None) -> LiftResult
+# Contribución propia (no-Obermeyer): entre los deprioritizados (fuera del top-k),
+# diferencia ponderada del residual del desenlace futuro entre personas con y sin
+# distrés. Hace no-circular el argumento de equidad (methods.md §2).
+
 audit_report(results, out_html) -> Path
 # Informe HTML autocontenido con todas las figuras y tablas.
 ```
 
-Requisitos: docstring con definición matemática exacta de cada métrica; soporte de `weights` en todas; tests unitarios con datos sintéticos de resultado conocido a mano; IC por bootstrap ponderado donde aplique.
+Requisitos: docstring con definición matemática exacta de cada métrica; soporte de `weights` en todas; tests unitarios con datos sintéticos de resultado conocido a mano; IC por bootstrap donde aplique —de diseño (remuestreo de PSU dentro de estratos VARSTR/VARPSU) en los resultados MEPS.
 
 ### 4.5 `riskaudit.chile`
 
