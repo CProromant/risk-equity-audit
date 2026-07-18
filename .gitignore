@@ -1,0 +1,35 @@
+# Data and artifacts are never versioned (PROTOCOL §1, guardrail 5)
+data/
+artifacts/
+*.dta
+*.zip
+*.parquet
+
+# Keep the data tree and the checksum manifest
+!data/
+!data/**/.gitkeep
+!data/checksums.txt
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+build/
+dist/
+.venv/
+venv/
+
+# Tooling caches
+.pytest_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+.mypy_cache/
+
+# OS / editor
+desktop.ini
+Thumbs.db
+.DS_Store
+.idea/
+.vscode/

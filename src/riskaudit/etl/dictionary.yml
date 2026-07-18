@@ -1,0 +1,31 @@
+# MEPS variable dictionary — the only place raw MEPS names live (PROTOCOL §4.1).
+# Every variable is verified against the codebook before use (guardrail 1):
+#   standard_name:
+#     meps: <raw MEPS name>
+#     file: <HC-233 | HC-243 | HC-244 | HC-251>
+#     codebook: <section or page reference>
+#     note: <optional>
+#
+# Populated in Phase 1. Entries below are placeholders to be verified, not used.
+
+design:
+  person_id:
+    meps: DUPERSID
+    file: HC-244
+    codebook: TBD
+  stratum:
+    meps: VARSTR
+    file: HC-244
+    codebook: TBD
+  psu:
+    meps: VARPSU
+    file: HC-244
+    codebook: TBD
+  weight_longitudinal:
+    meps: LONGWT
+    file: HC-244
+    codebook: TBD
+  weight_saq_longitudinal:
+    meps: LSAQWT
+    file: HC-244
+    codebook: TBD
