@@ -1,5 +1,24 @@
+from dataclasses import dataclass
+
 import numpy as np
 from numpy.typing import ArrayLike
+
+
+@dataclass
+class SurveyDesign:
+    """Stratum and PSU labels for design-based (cluster) bootstrap resampling.
+
+    Pass one to the CI-bearing audit functions to resample PSUs within strata
+    (VARSTR/VARPSU) instead of individual rows, so the interval reflects the
+    survey design. Strata with a single PSU are held fixed.
+    """
+
+    strata: np.ndarray
+    psu: np.ndarray
+
+    def __post_init__(self):
+        self.strata = np.asarray(self.strata)
+        self.psu = np.asarray(self.psu)
 
 
 def to_float(x: ArrayLike) -> np.ndarray:
@@ -24,8 +43,28 @@ def wmean(x: np.ndarray, w: np.ndarray) -> float:
     return float(np.sum(w * x) / np.sum(w))
 
 
-def boot_ci(stat, n: int, n_boot: int, seed: int) -> tuple[float, float]:
-    """Percentile CI from a row-resampling bootstrap of ``stat`` (seeded, reproducible)."""
+def _cluster_indices(rng, design: SurveyDesign) -> np.ndarray:
+    parts = []
+    for st in np.unique(design.strata):
+        rows = np.where(design.strata == st)[0]
+        psus = np.unique(design.psu[rows])
+        if psus.size < 2:
+            parts.append(rows)
+            continue
+        for c in rng.choice(psus, size=psus.size, replace=True):
+            parts.append(rows[design.psu[rows] == c])
+    return np.concatenate(parts)
+
+
+def boot_ci(stat, n: int, n_boot: int, seed: int, design: SurveyDesign | None = None):
+    """Percentile CI from a seeded bootstrap of ``stat``.
+
+    Resamples rows uniformly, or PSUs within strata when a ``design`` is given.
+    """
     rng = np.random.default_rng(seed)
-    vals = np.array([stat(rng.integers(0, n, n)) for _ in range(n_boot)])
+
+    def draw():
+        return rng.integers(0, n, n) if design is None else _cluster_indices(rng, design)
+
+    vals = np.array([stat(draw()) for _ in range(n_boot)])
     return float(np.nanpercentile(vals, 2.5)), float(np.nanpercentile(vals, 97.5))

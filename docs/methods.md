@@ -78,6 +78,11 @@ re-run the design on the subset; that understates variance and is the classic ME
 trap. This is the project standard for every subgroup result, including the severe
 subgroup of §6.
 
+The audit package implements design-based variance as a **stratified cluster
+bootstrap** (`SurveyDesign(strata=VARSTR, psu=VARPSU)`): each resample draws PSUs
+with replacement within strata rather than individual rows. Omitting the design
+falls back to a plain row bootstrap for non-survey data.
+
 ## 4. Model comparability (D3)
 
 The three targets — T1 `log1p(TOTEXP_t1)`, T2 avoidable-utilization count and its

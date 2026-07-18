@@ -4,7 +4,14 @@ import numpy as np
 from numpy.typing import ArrayLike
 
 from riskaudit._config import SEED
-from riskaudit.audit._common import boot_ci, to_float, topk_mask, weights_or_ones, wmean
+from riskaudit.audit._common import (
+    SurveyDesign,
+    boot_ci,
+    to_float,
+    topk_mask,
+    weights_or_ones,
+    wmean,
+)
 
 
 @dataclass
@@ -29,6 +36,7 @@ def regression_to_mean(
     k: float = 0.10,
     weights: ArrayLike | None = None,
     n_boot: int = 1000,
+    design: SurveyDesign | None = None,
 ) -> RTMResult:
     r"""Share of the top-``k`` outcome drop attributable to regression to the mean.
 
@@ -82,5 +90,5 @@ def regression_to_mean(
     observed = wmean(yt[top], w[top]) - wmean(yt1[top], w[top])
     rho = _wcorr(yt, yt1, w)
     expected = (1 - rho) * (wmean(yt[top], w[top]) - mu)
-    ci = boot_ci(stat, yt.shape[0], n_boot, SEED)
+    ci = boot_ci(stat, yt.shape[0], n_boot, SEED, design)
     return RTMResult(float(observed), float(expected), float(expected / observed), ci)

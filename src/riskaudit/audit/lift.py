@@ -3,7 +3,14 @@ from dataclasses import dataclass
 from numpy.typing import ArrayLike
 
 from riskaudit._config import SEED
-from riskaudit.audit._common import boot_ci, to_float, topk_mask, weights_or_ones, wmean
+from riskaudit.audit._common import (
+    SurveyDesign,
+    boot_ci,
+    to_float,
+    topk_mask,
+    weights_or_ones,
+    wmean,
+)
 
 
 @dataclass
@@ -22,6 +29,7 @@ def incremental_lift(
     k: float = 0.10,
     weights: ArrayLike | None = None,
     n_boot: int = 1000,
+    design: SurveyDesign | None = None,
 ) -> LiftResult:
     r"""Incremental need lift in the low-score tail (the contribution metric).
 
@@ -80,5 +88,5 @@ def incremental_lift(
     tail = ~topk_mask(s, w, k)
     rd = wmean(r[tail & (d == 1)], w[tail & (d == 1)])
     ro = wmean(r[tail & (d == 0)], w[tail & (d == 0)])
-    ci = boot_ci(stat, y.shape[0], n_boot, SEED)
+    ci = boot_ci(stat, y.shape[0], n_boot, SEED, design)
     return LiftResult(float(rd - ro), ci, float(rd), float(ro))

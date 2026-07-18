@@ -3,6 +3,7 @@ import pandas as pd
 from sklearn.linear_model import LinearRegression
 
 from riskaudit.audit import (
+    SurveyDesign,
     ablation,
     audit_report,
     incremental_lift,
@@ -47,6 +48,21 @@ def test_rtm_share_matches_formula():
     )
     assert abs(r.observed_drop - 1.0) < 1e-12
     assert abs(r.rtm_share - 0.585786) < 1e-4
+
+
+def test_design_single_psu_per_stratum_collapses_ci():
+    # one PSU per stratum -> cluster resampling can't vary -> zero-width CI at value.
+    design = SurveyDesign(strata=[1, 1, 2, 2, 3, 3], psu=[1, 1, 1, 1, 1, 1])
+    r = top_k_capture([6, 5, 4, 3, 2, 1], need=[0, 0, 0, 1, 1, 1], k=0.5, design=design, n_boot=50)
+    assert abs(r.ci[0] - r.value) < 1e-9 and abs(r.ci[1] - r.value) < 1e-9
+
+
+def test_design_affects_ci_not_point_estimate():
+    design = SurveyDesign(strata=[1, 1, 2, 2], psu=[1, 2, 1, 2])
+    base = top_k_capture([4, 3, 2, 1], [1, 1, 1, 0], k=0.5, n_boot=80)
+    des = top_k_capture([4, 3, 2, 1], [1, 1, 1, 0], k=0.5, n_boot=80, design=design)
+    assert des.value == base.value
+    assert np.isfinite(des.ci).all() and des.ci[0] <= des.ci[1]
 
 
 def test_ablation_relevant_group_dominates_global_loss():

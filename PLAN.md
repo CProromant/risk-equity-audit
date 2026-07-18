@@ -333,7 +333,7 @@ Para cada función: firma estable, docstring con **definición matemática exact
 - [~] F3: **`audit/` implementado** (6 funciones, 17 tests, cobertura 99%) · falta demo Synthea + ejemplo de API en README
 - [ ] F4: `make chile` → 4 figuras + tabla con fuentes · `methods.md` explica la triangulación
 - [ ] F5: README bilingüe completo · CHANGELOG · tag `v0.1.0` · Zenodo/cita · backlog en issues
-- [ ] Transversal: métrica `incremental_lift` (contribución propia, `methods.md` §2) · **bootstrap de diseño VARSTR/VARPSU** para IC publicables (hoy el paquete usa bootstrap simple)
+- [x] Transversal: métrica `incremental_lift` (contribución propia, `methods.md` §2) ✅ · **bootstrap de diseño VARSTR/VARPSU** ✅ (`SurveyDesign`; en el lift real el efecto de diseño ≈1, el hallazgo aguanta). Pendiente: cablearlos en el pipeline MEPS de la Fase 2.
 
 ---
 

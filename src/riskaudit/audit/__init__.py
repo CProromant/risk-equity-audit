@@ -1,3 +1,4 @@
+from riskaudit.audit._common import SurveyDesign
 from riskaudit.audit.ablation import AblationResult, ablation
 from riskaudit.audit.capture import CaptureResult, top_k_capture
 from riskaudit.audit.curves import CurveResult, label_choice_curve
@@ -12,6 +13,7 @@ __all__ = [
     "CurveResult",
     "LiftResult",
     "RTMResult",
+    "SurveyDesign",
     "ablation",
     "audit_report",
     "incremental_lift",

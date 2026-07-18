@@ -4,7 +4,7 @@ import numpy as np
 from numpy.typing import ArrayLike
 
 from riskaudit._config import SEED
-from riskaudit.audit._common import boot_ci, to_float, topk_mask, weights_or_ones
+from riskaudit.audit._common import SurveyDesign, boot_ci, to_float, topk_mask, weights_or_ones
 
 
 @dataclass
@@ -20,6 +20,7 @@ def top_k_capture(
     k: float = 0.10,
     weights: ArrayLike | None = None,
     n_boot: int = 1000,
+    design: SurveyDesign | None = None,
 ) -> CaptureResult:
     r"""Weighted share of total need captured by the top-``k`` of ``scores``.
 
@@ -64,5 +65,5 @@ def top_k_capture(
         return float(wn[mask].sum() / wn.sum())
 
     value = stat(np.arange(s.shape[0]))
-    ci = boot_ci(stat, s.shape[0], n_boot, SEED)
+    ci = boot_ci(stat, s.shape[0], n_boot, SEED, design)
     return CaptureResult(value, ci, k)
