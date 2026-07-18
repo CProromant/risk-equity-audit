@@ -5,6 +5,7 @@ from sklearn.linear_model import LinearRegression
 from riskaudit.audit import (
     ablation,
     audit_report,
+    incremental_lift,
     label_choice_curve,
     reclassification,
     regression_to_mean,
@@ -64,6 +65,22 @@ def test_ablation_relevant_group_dominates_global_loss():
     assert abs(res.global_delta.loc["noise", "delta"]) < 0.1
 
 
+def test_incremental_lift_hand_value():
+    # top-50% by weight = the 3 highest scores; tail = scores 7,6,5 (indices 3,4,5).
+    # tail residuals: distressed {2,4} mean 3, non-distressed {1} mean 1 -> lift 2.
+    r = incremental_lift(
+        y_t1=[0, 0, 0, 2, 4, 1],
+        y_pred=[0, 0, 0, 0, 0, 0],
+        distress=[0, 0, 0, 1, 1, 0],
+        scores=[10, 9, 8, 7, 6, 5],
+        k=0.5,
+        n_boot=100,
+    )
+    assert abs(r.value - 2.0) < 1e-12
+    assert abs(r.residual_distressed - 3.0) < 1e-12
+    assert abs(r.residual_other - 1.0) < 1e-12
+
+
 def test_ablation_binary_target_uses_auc():
     rng = np.random.default_rng(1)
     n = 200
@@ -86,6 +103,14 @@ def test_audit_report_renders_every_result_type(tmp_path):
         "reclass": reclassification([4, 3, 2, 1], [1, 2, 3, 4], k=0.5),
         "curve": label_choice_curve([1, 2, 3, 4], [0, 0, 1, 1], bins=2),
         "rtm": regression_to_mean([0, 0, 4, 4], [0, 2, 2, 4], [1, 2, 3, 4], k=0.5, n_boot=50),
+        "lift": incremental_lift(
+            [0, 0, 0, 2, 4, 1],
+            [0] * 6,
+            [0, 0, 0, 1, 1, 0],
+            [10, 9, 8, 7, 6, 5],
+            k=0.5,
+            n_boot=50,
+        ),
         "ablation": ablation(
             fit,
             pd.DataFrame({"a": [1.0, 2, 3, 4], "b": [4.0, 3, 2, 1]}),
@@ -99,3 +124,4 @@ def test_audit_report_renders_every_result_type(tmp_path):
     assert out.exists()
     assert "capture" in html and "<table" in html and "data:image/png" in html
     assert "RTM share" in html and "global Δ" in html and "plain text" in html
+    assert "incremental lift" in html

@@ -12,6 +12,7 @@ import pandas as pd  # noqa: E402
 from riskaudit.audit.ablation import AblationResult  # noqa: E402
 from riskaudit.audit.capture import CaptureResult  # noqa: E402
 from riskaudit.audit.curves import CurveResult  # noqa: E402
+from riskaudit.audit.lift import LiftResult  # noqa: E402
 from riskaudit.audit.rtm import RTMResult  # noqa: E402
 
 _STYLE = (
@@ -39,6 +40,12 @@ def _render(name: str, r: Any) -> str:
             f"<p><b>{name}</b>: observed drop {r.observed_drop:.3g}, RTM-expected "
             f"{r.rtm_expected_drop:.3g}, RTM share {r.rtm_share:.1%} "
             f"(95% CI {r.ci[0]:.1%}–{r.ci[1]:.1%})</p>"
+        )
+    if isinstance(r, LiftResult):
+        return (
+            f"<p><b>{name}</b>: incremental lift = {r.value:.3g} "
+            f"(distressed residual {r.residual_distressed:.3g} vs "
+            f"{r.residual_other:.3g}; 95% CI {r.ci[0]:.3g}–{r.ci[1]:.3g})</p>"
         )
     if isinstance(r, CurveResult):
         fig, ax = plt.subplots(figsize=(5, 3))
