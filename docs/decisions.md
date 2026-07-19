@@ -92,3 +92,9 @@ filas que un test del 20%). Métricas OOF: spend R²≈0.48, avoidable AUC≈0.6
 (K6 dominado por K6_t — semi-tautológico, ya documentado). HP tuneados por target sobre
 un grid chico y congelados (D3). Salidas en `artifacts/`: `predictions.parquet`,
 `metrics.json` (con SHAP), `model_{target}.txt`.
+
+### Demo: sintético auto-contenido, no Synthea
+El PROTOCOL proponía Synthea. Uso un **generador sintético dentro de `demo/run_demo.py`**
+(determinista, `seed=2026`): el auditor solo necesita scores+need+weights, así que un
+dataset inventado en el script es más robusto y rápido que una descarga externa frágil, y
+cumple el mismo propósito (ver la herramienta funcionar sin datos reales ni PHI).

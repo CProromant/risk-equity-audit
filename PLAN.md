@@ -300,7 +300,7 @@ Para cada función: firma estable, docstring con **definición matemática exact
 - [x] F0: `pip install -e ".[dev]"` ok · `pytest` verde · pre-commit activo · CI (confirmar verde en Actions)
 - [x] F1: N panel = 6.741 (3.001 adultos K6 ambos años) documentado · `dictionary.yml` verificado · tests esquema/rango · perfilado en `artifacts/`
 - [x] F2: `make models && make audit` reproducible · informe HTML con las 7 piezas · todo ponderado · severo solo descriptivo (captura K6 spend 15% vs K6 29%; lift +0.77, IC excluye 0)
-- [~] F3: **`audit/` implementado** (7 funciones, 20 tests, cobertura 99%) · falta demo Synthea + ejemplo de API en README
+- [x] F3: **`audit/` implementado** (7 funciones, cobertura 99%) · demo auto-contenido ✅ · ejemplo de API en README ✅
 - [ ] F4: README bilingüe completo · CHANGELOG · tag `v0.1.0` · Zenodo/cita · backlog en issues
 - [x] Transversal: métrica `incremental_lift` (contribución propia, `methods.md` §2) ✅ · **bootstrap de diseño VARSTR/VARPSU** ✅ (`SurveyDesign`; en el lift real el efecto de diseño ≈1, el hallazgo aguanta). Pendiente: cablearlos en el pipeline MEPS de la Fase 2.
 

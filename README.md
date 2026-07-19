@@ -8,7 +8,7 @@
 ![python](https://img.shields.io/badge/python-%E2%89%A53.11-blue)
 ![license](https://img.shields.io/badge/license-MIT-green)
 
-> **Project status.** Active development toward `v0.1.0`. The **`riskaudit` audit package is implemented and tested** (7 functions, design-based CIs, ~99% coverage) and the **MEPS data pipeline is built**; the full MEPS modeling run and the Synthea demo are still in progress. See the [Roadmap](#roadmap--hoja-de-ruta). Built phase by phase per [`PROTOCOL.md`](PROTOCOL.md) and [`PLAN.md`](PLAN.md).
+> **Project status.** Active development toward `v0.1.0`. The **`riskaudit` audit package is implemented and tested** (7 functions, design-based CIs, ~99% coverage) the **MEPS case study is complete**, and a **self-contained demo** runs end to end; the `v0.1.0` release (CHANGELOG, tag, DOI) is what remains. See the [Roadmap](#roadmap--hoja-de-ruta). Built phase by phase per [`PROTOCOL.md`](PROTOCOL.md) and [`PLAN.md`](PLAN.md).
 
 *(Versión en español más abajo — [ir al español](#español).)*
 
@@ -30,7 +30,7 @@ This is **label-choice bias**: a well-documented failure where an algorithm trai
 
 1. **`riskaudit`** — an installable Python package that audits label-choice bias in any risk-stratification model. **This is the product:** a reusable tool that does not depend on any particular dataset.
 2. **A worked example on MEPS 2021–2023** — a reproducible pipeline (three targets, identical models, full audit) that shows the tool finds real bias on U.S. survey data. It is a demonstration, not the point.
-3. **End-to-end demo** — runs on synthetic data (Synthea) in under 10 minutes, with **no credentials and no PHI**, so anyone can see the tool working.
+3. **End-to-end demo** — a self-contained synthetic run (`demo/run_demo.py`), with **no credentials and no PHI**, so anyone can see the tool working in seconds.
 
 ---
 
@@ -85,7 +85,11 @@ print(f"Top-decile capture of need: {capture.value:.1%}")
 audit_report({"capture": capture, "curve": curve}, out_html="audit.html")
 ```
 
-The audit API above runs today. The full synthetic end-to-end demo (`demo/run_demo.py`, Synthea, no PHI, < 10 min) lands in Phase 3.
+The audit API above runs today, and a self-contained synthetic demo shows the whole flow end to end:
+
+```bash
+python demo/run_demo.py   # no real data, no PHI, a few seconds, writes demo_report.html
+```
 
 ---
 
@@ -94,7 +98,7 @@ The audit API above runs today. The full synthetic end-to-end demo (`demo/run_de
 No data is stored in this repository. Only download scripts and checksums are versioned; everything under `data/` is git-ignored.
 
 - **Core — MEPS (AHRQ, U.S.):** HC-233 (2021), HC-243 (2022), HC-251 (2023), **HC-244 (Panel 26 Longitudinal 2021–2022)**, plus **HC-231** (2021 Conditions) and **HC-229A** (2021 Prescribed Medicines) for the mental-health treatment proxy — free, no registration; downloaded with SHA-256 checksums. See [`PROTOCOL.md`](PROTOCOL.md) §3 for exact files, weights, and codebook references.
-- **Synthetic (demo):** [Synthea](https://synthea.mitre.org/) — no real patients.
+- **Synthetic (demo):** generated in-script by `demo/run_demo.py` — no external data, no real patients.
 
 ---
 
@@ -115,7 +119,7 @@ Built phase by phase (see [`PLAN.md`](PLAN.md) for task-level detail and accepta
 - **Phase 0** ✅ — Scaffolding: package layout, CI, tooling.
 - **Phase 1** ✅ — MEPS ETL: verified data dictionary, cleaned panel (6,741 persons).
 - **Phase 2** ✅ — Models + full weighted, design-based audit on MEPS.
-- **Phase 3** ◐ — `riskaudit.audit` API done (~99% coverage); Synthea demo pending.
+- **Phase 3** ✅ — `riskaudit.audit` API (~99% coverage) + self-contained synthetic demo.
 - **Phase 4** — Release `v0.1.0` (bilingual README, CHANGELOG, Zenodo DOI).
 
 ## How to cite
@@ -137,7 +141,7 @@ A citation with a Zenodo DOI will be added at release. For now, please cite the 
 
 `riskaudit` es una herramienta en Python que audita *cualquier* modelo de estratificación de riesgo en busca de **sesgo por elección de la etiqueta** (*label-choice bias*): el error sistemático que aparece cuando el modelo se entrena con un proxy equivocado de "necesidad" (típicamente el **gasto sanitario**) en lugar de la necesidad misma. La herramienta es el producto; un ejemplo reproducible sobre datos de MEPS (EE.UU.) muestra que encuentra sesgo real.
 
-> **Estado del proyecto.** En desarrollo activo hacia `v0.1.0`. El **paquete de auditoría `riskaudit` está implementado y testeado** (7 funciones, IC de diseño, ~99% de cobertura) y el **pipeline de datos MEPS está construido**; el modelado MEPS completo y el demo Synthea siguen en curso. Ver la [hoja de ruta](#roadmap--hoja-de-ruta). Construido por fases según [`PROTOCOL.md`](PROTOCOL.md) y [`PLAN.md`](PLAN.md).
+> **Estado del proyecto.** En desarrollo activo hacia `v0.1.0`. El **paquete de auditoría `riskaudit` está implementado y testeado** (7 funciones, IC de diseño, ~99% de cobertura) el **estudio MEPS está completo** y un **demo auto-contenido** corre de punta a punta; falta el release `v0.1.0` (CHANGELOG, tag, DOI). Ver la [hoja de ruta](#roadmap--hoja-de-ruta). Construido por fases según [`PROTOCOL.md`](PROTOCOL.md) y [`PLAN.md`](PLAN.md).
 
 ## Qué es esto
 
@@ -153,7 +157,7 @@ Esto es el **sesgo por elección de la etiqueta**: una falla bien documentada en
 
 1. **`riskaudit`** — paquete Python instalable que audita el sesgo por elección de etiqueta en cualquier modelo de estratificación de riesgo. **Es el producto:** una herramienta reutilizable que no depende de ninguna base en particular.
 2. **Un ejemplo demostrativo sobre MEPS 2021–2023** — pipeline reproducible (tres targets, modelos idénticos, auditoría completa) que muestra que la herramienta encuentra sesgo real con datos de EE.UU. Es una demostración, no el objetivo.
-3. **Demo end-to-end** — corre sobre datos sintéticos (Synthea) en menos de 10 minutos, **sin credenciales ni datos sensibles**.
+3. **Demo end-to-end** — una corrida auto-contenida sobre datos sintéticos (`demo/run_demo.py`), **sin credenciales ni datos sensibles**, en segundos.
 
 ## La herramienta `riskaudit`
 
@@ -175,7 +179,7 @@ Como trabaja solo con puntajes y una medida de necesidad, `riskaudit` es **agnó
 
 ## Instalación y quickstart
 
-Igual que en la sección en inglés (Python ≥ 3.11, `pip install -e ".[dev]"`). El ejemplo mínimo de la API funciona hoy; el demo Synthea (`demo/run_demo.py`) llega en la Fase 3.
+Igual que en la sección en inglés (Python ≥ 3.11, `pip install -e ".[dev]"`). El ejemplo mínimo de la API funciona hoy, y un demo auto-contenido muestra el flujo completo: `python demo/run_demo.py` (sin datos reales, sin PHI, segundos).
 
 ## Limitaciones
 
