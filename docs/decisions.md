@@ -83,3 +83,12 @@ escitalopram, duloxetina. **N:** 21.2% del panel tratado; distrés severo K6_t�
 los cuales **63 sin tratamiento** (subgrupo pequeño → solo descriptivo, guardrail 4).
 Robustez (backlog): definición estrecha (solo mood/ansiedad). Salida:
 `data/processed/treatment.parquet` vía `build_treatment_proxy`.
+
+### Predicciones: OOF 5-fold sobre todo el dominio (en vez de split 80/20)
+El PROTOCOL §4.3 pedía split 80/20. Uso **5-fold cross-fitting sobre toda la muestra
+analítica** (folds estratificados por decil de gasto_t): cada fila queda predicha por un
+modelo que no la vio, así el audit corre sobre las 3.001 con predicciones honestas (más
+filas que un test del 20%). Métricas OOF: spend R²≈0.48, avoidable AUC≈0.69, K6 R²≈0.41
+(K6 dominado por K6_t — semi-tautológico, ya documentado). HP tuneados por target sobre
+un grid chico y congelados (D3). Salidas en `artifacts/`: `predictions.parquet`,
+`metrics.json` (con SHAP), `model_{target}.txt`.
