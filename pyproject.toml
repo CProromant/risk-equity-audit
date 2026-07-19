@@ -28,9 +28,7 @@ dependencies = [
     "shap",
     "pyyaml",
     "requests",
-    "jinja2",
     "matplotlib",
-    "samplics",
 ]
 
 [project.optional-dependencies]

@@ -1,3 +1,5 @@
+import math
+
 import numpy as np
 import pandas as pd
 from sklearn.linear_model import LinearRegression
@@ -17,7 +19,7 @@ from riskaudit.audit import (
 def test_capture_weighted_hand_value():
     # top 50% by weight = units {0,1,2} (cum weight 6 >= 5); weighted need 6 of 34.
     r = top_k_capture([10, 9, 8, 7], need=[1, 1, 1, 7], k=0.5, weights=[2, 2, 2, 4], n_boot=200)
-    assert r.value == round(6 / 34, 10) or abs(r.value - 6 / 34) < 1e-9
+    assert abs(r.value - 6 / 34) < 1e-9
     assert r.ci[0] <= r.ci[1] and np.isfinite(r.ci).all()
 
 
@@ -63,6 +65,13 @@ def test_design_affects_ci_not_point_estimate():
     des = top_k_capture([4, 3, 2, 1], [1, 1, 1, 0], k=0.5, n_boot=80, design=design)
     assert des.value == base.value
     assert np.isfinite(des.ci).all() and des.ci[0] <= des.ci[1]
+
+
+def test_rtm_no_drop_returns_nan_share():
+    # top-k outcome does not fall (y_t == y_t1) -> share is undefined, not a crash.
+    r = regression_to_mean([1, 2, 3, 4], [1, 2, 3, 4], [1, 2, 3, 4], k=0.5, n_boot=20)
+    assert r.observed_drop == 0.0
+    assert math.isnan(r.rtm_share)
 
 
 def test_ablation_relevant_group_dominates_global_loss():

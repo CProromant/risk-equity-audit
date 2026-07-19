@@ -90,5 +90,6 @@ def regression_to_mean(
     observed = wmean(yt[top], w[top]) - wmean(yt1[top], w[top])
     rho = _wcorr(yt, yt1, w)
     expected = (1 - rho) * (wmean(yt[top], w[top]) - mu)
+    share = float(expected / observed) if abs(observed) > 1e-12 else float("nan")
     ci = boot_ci(stat, yt.shape[0], n_boot, SEED, design)
-    return RTMResult(float(observed), float(expected), float(expected / observed), ci)
+    return RTMResult(float(observed), float(expected), share, ci)

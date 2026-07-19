@@ -19,4 +19,4 @@ jobs:
       - run: pip install -e ".[dev]"
       - run: ruff check .
       - run: ruff format --check .
-      - run: pytest
+      - run: pytest --cov=riskaudit.audit --cov-fail-under=90
