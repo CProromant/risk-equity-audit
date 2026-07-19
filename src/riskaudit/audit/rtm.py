@@ -65,6 +65,9 @@ def regression_to_mean(
         Survey weights; all ones when omitted.
     n_boot : int, default 1000
         Weighted bootstrap resamples for the confidence interval.
+    design : SurveyDesign, optional
+        When given, the CI resamples PSUs within strata (VARSTR/VARPSU) instead
+        of rows, for a design-based interval.
 
     Returns
     -------

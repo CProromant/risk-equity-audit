@@ -43,6 +43,13 @@ def wmean(x: np.ndarray, w: np.ndarray) -> float:
     return float(np.sum(w * x) / np.sum(w))
 
 
+def weighted_capture(scores: np.ndarray, need: np.ndarray, weights: np.ndarray, k: float) -> float:
+    """Weighted share of total need falling in the top-``k`` (by weight) of ``scores``."""
+    mask = topk_mask(scores, weights, k)
+    wn = weights * need
+    return float(wn[mask].sum() / wn.sum())
+
+
 def _cluster_indices(rng, design: SurveyDesign) -> np.ndarray:
     parts = []
     for st in np.unique(design.strata):

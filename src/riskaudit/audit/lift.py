@@ -66,6 +66,9 @@ def incremental_lift(
         Survey weights; all ones when omitted.
     n_boot : int, default 1000
         Bootstrap resamples for the confidence interval.
+    design : SurveyDesign, optional
+        When given, the CI resamples PSUs within strata (VARSTR/VARPSU) instead
+        of rows, for a design-based interval.
 
     Returns
     -------
@@ -86,7 +89,8 @@ def incremental_lift(
         return wmean(r[idx][one], w[idx][one]) - wmean(r[idx][zero], w[idx][zero])
 
     tail = ~topk_mask(s, w, k)
-    rd = wmean(r[tail & (d == 1)], w[tail & (d == 1)])
-    ro = wmean(r[tail & (d == 0)], w[tail & (d == 0)])
+    one, zero = tail & (d == 1), tail & (d == 0)
+    rd = wmean(r[one], w[one])
+    ro = wmean(r[zero], w[zero])
     ci = boot_ci(stat, y.shape[0], n_boot, SEED, design)
     return LiftResult(float(rd - ro), ci, float(rd), float(ro))

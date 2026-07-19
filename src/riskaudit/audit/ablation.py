@@ -6,7 +6,7 @@ import pandas as pd
 from numpy.typing import ArrayLike
 from sklearn.metrics import r2_score, roc_auc_score
 
-from riskaudit.audit._common import to_float, topk_mask, weights_or_ones
+from riskaudit.audit._common import to_float, weighted_capture, weights_or_ones
 
 
 @dataclass
@@ -19,12 +19,6 @@ def _perf(y: np.ndarray, pred: np.ndarray, w: np.ndarray) -> float:
     if np.isin(np.unique(y), [0, 1]).all():
         return float(roc_auc_score(y, pred, sample_weight=w))
     return float(r2_score(y, pred, sample_weight=w))
-
-
-def _capture(pred: np.ndarray, need: np.ndarray, w: np.ndarray, k: float) -> float:
-    mask = topk_mask(pred, w, k)
-    wn = w * need
-    return float(wn[mask].sum() / wn.sum())
 
 
 def ablation(
@@ -73,7 +67,7 @@ def ablation(
     need = to_float(y)
     full = fit_fn(X, y)
     p0 = np.asarray(full.predict(X), dtype=float)
-    g0, c0 = _perf(np.asarray(y), p0, w), _capture(p0, need, w, k)
+    g0, c0 = _perf(np.asarray(y), p0, w), weighted_capture(p0, need, w, k)
 
     gd, cd = {}, {}
     for name, cols in feature_groups.items():
@@ -81,7 +75,7 @@ def ablation(
         m = fit_fn(xg, y)
         pg = np.asarray(m.predict(xg), dtype=float)
         gd[name] = g0 - _perf(np.asarray(y), pg, w)
-        cd[name] = c0 - _capture(pg, need, w, k)
+        cd[name] = c0 - weighted_capture(pg, need, w, k)
     return AblationResult(
         pd.DataFrame({"delta": gd}),
         pd.DataFrame({"delta": cd}),

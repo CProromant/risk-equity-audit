@@ -4,7 +4,13 @@ import numpy as np
 from numpy.typing import ArrayLike
 
 from riskaudit._config import SEED
-from riskaudit.audit._common import SurveyDesign, boot_ci, to_float, topk_mask, weights_or_ones
+from riskaudit.audit._common import (
+    SurveyDesign,
+    boot_ci,
+    to_float,
+    weighted_capture,
+    weights_or_ones,
+)
 
 
 @dataclass
@@ -49,6 +55,9 @@ def top_k_capture(
         Survey weights; treated as all ones when omitted.
     n_boot : int, default 1000
         Weighted bootstrap resamples for the confidence interval.
+    design : SurveyDesign, optional
+        When given, the CI resamples PSUs within strata (VARSTR/VARPSU) instead
+        of rows, for a design-based interval.
 
     Returns
     -------
@@ -60,9 +69,7 @@ def top_k_capture(
     w = weights_or_ones(weights, s.shape[0])
 
     def stat(idx: np.ndarray) -> float:
-        mask = topk_mask(s[idx], w[idx], k)
-        wn = w[idx] * nd[idx]
-        return float(wn[mask].sum() / wn.sum())
+        return weighted_capture(s[idx], nd[idx], w[idx], k)
 
     value = stat(np.arange(s.shape[0]))
     ci = boot_ci(stat, s.shape[0], n_boot, SEED, design)
