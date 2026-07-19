@@ -72,3 +72,14 @@ sin verificar.
 La máquina intercepta el HTTPS de Python con una raíz que OpenSSL 3 rechaza (falla hasta
 github.com). `download.py` verifica TLS por defecto pero acepta `RISKAUDIT_INSECURE_TLS=1`
 (o `RISKAUDIT_CA_BUNDLE`); la integridad la garantizan los SHA-256 de `data/checksums.txt`.
+
+## 2026-07-19 — Fase 2: proxy de tratamiento de salud mental
+
+Operacionalización verificada contra los datos (guardrail 1). **Tratado_SM 2021** =
+condición SM en HC-231 (ICD-10 `F*` o CCSR `MBD*`) **o** psicofármaco en HC-229A (clases
+Multum {67,70,71,76,77,79,208,209,210,242,249,251,306,307,308,341,504,516}; se excluyen
+los cajones CNS 57/80). Sanity: los fármacos más frecuentes son sertralina, trazodona,
+escitalopram, duloxetina. **N:** 21.2% del panel tratado; distrés severo K6_t≥13 = 190, de
+los cuales **63 sin tratamiento** (subgrupo pequeño → solo descriptivo, guardrail 4).
+Robustez (backlog): definición estrecha (solo mood/ansiedad). Salida:
+`data/processed/treatment.parquet` vía `build_treatment_proxy`.

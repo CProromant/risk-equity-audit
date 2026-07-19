@@ -89,6 +89,11 @@ fyc:                              # sources: HC-233 (2021), HC-243 (2022), HC-25
     office_visits:  {name: "OBTOTV{yy}",  label: "Office-based visits"}
     rx:             {name: "RXTOT{yy}",   label: "Prescription fills"}
 
-# Deferred (guardrail 1): the "untreated mental health" flag needs a treatment
-# proxy (mental-health visits / MH expenditure), which lives in the event/condition
-# files, not here. Operationalized in docs/methods.md before Phase 2 uses it.
+treatment:                        # 2021 mental-health treatment proxy (docs/methods.md §1)
+  conditions:                     # source: HC-231
+    person_id: {name: DUPERSID, label: "Person id"}
+    icd10:     {name: ICD10CDX, label: "ICD-10-CM code for condition (edited); F* = mental"}
+    ccsr:      {name: CCSR1X,   label: "CCSR category 1 (edited); MBD* = mental/behavioral"}
+  medicines:                      # source: HC-229A
+    person_id:  {name: DUPERSID, label: "Person id"}
+    multum_tc1: {name: TC1,      label: "Multum therapeutic class #1; psychotropic set in methods.md §1"}

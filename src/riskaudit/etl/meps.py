@@ -24,6 +24,13 @@ _KEEP_RAW = {
     "year",
 }
 
+# Multum therapeutic classes counted as psychotropic, verified against HC-229A value
+# labels: antidepressants, antipsychotics, anxiolytics/sedatives/hypnotics, antimanic,
+# ADHD agents, psychotherapeutics. Broad CNS catch-alls (57, 80) are excluded.
+_MH_TC1 = frozenset(
+    {67, 70, 71, 76, 77, 79, 208, 209, 210, 242, 249, 251, 306, 307, 308, 341, 504, 516}
+)
+
 
 def _spec() -> dict:
     return yaml.safe_load(_DICT.read_text())
@@ -65,4 +72,28 @@ def build_fyc_pooled(raw_dir: Path = RAW_DIR, out_path: Path | None = None) -> P
     out = out_path or PROCESSED_DIR / "fyc_pooled.parquet"
     out.parent.mkdir(parents=True, exist_ok=True)
     pd.concat(frames, ignore_index=True).to_parquet(out, index=False)
+    return out
+
+
+def _treated_ids(cond: pd.DataFrame, pmed: pd.DataFrame) -> set:
+    icd = cond["ICD10CDX"].astype(str)
+    ccsr = cond["CCSR1X"].astype(str)
+    ids = set(cond.loc[icd.str.startswith("F") | ccsr.str.startswith("MBD"), "DUPERSID"])
+    return ids | set(pmed.loc[pmed["TC1"].isin(_MH_TC1), "DUPERSID"])
+
+
+def build_treatment_proxy(raw_dir: Path = RAW_DIR, out_path: Path | None = None) -> Path:
+    """Person-level 2021 mental-health treatment flag (docs/methods.md §1).
+
+    Treated = a mental-health condition (ICD-10 F* or CCSR MBD*) in HC-231, or a
+    psychotropic prescription (Multum class in ``_MH_TC1``) in HC-229A.
+    """
+    cond, _ = pyreadstat.read_dta(
+        str(raw_dir / "h231.dta"), usecols=["DUPERSID", "ICD10CDX", "CCSR1X"]
+    )
+    pmed, _ = pyreadstat.read_dta(str(raw_dir / "h229a.dta"), usecols=["DUPERSID", "TC1"])
+    ids = _treated_ids(cond, pmed)
+    out = out_path or PROCESSED_DIR / "treatment.parquet"
+    out.parent.mkdir(parents=True, exist_ok=True)
+    pd.DataFrame({"person_id": sorted(ids), "treated_mh": 1}).to_parquet(out, index=False)
     return out

@@ -28,6 +28,15 @@ report both, with the continuous one primary:
 
 A result is reported as a finding only if it holds under both.
 
+**Untreated-distress flag.** The mechanism is about people in distress the system has
+not seen. A person is *treated for mental health* in year $t$ if the Conditions file
+(HC-231) records a mental-health condition (ICD-10 `F01`–`F99`, or a CCSR `MBD*`
+category) or the Prescribed Medicines file (HC-229A) records a psychotropic (Multum
+classes for antidepressants, antipsychotics, anxiolytics/sedatives/hypnotics,
+antimanic, ADHD agents and psychotherapeutics; broad CNS catch-all classes excluded).
+The **untreated-distress** group is K6$_t \ge 13$ and not treated — a descriptive flag,
+never a target (§6). In the panel it is ~63 people.
+
 ## 2. Contribution metric — incremental need lift in the low-score tail
 
 This is the original, non-Obermeyer contribution and the empirical spine of the
