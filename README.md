@@ -114,7 +114,7 @@ Built phase by phase (see [`PLAN.md`](PLAN.md) for task-level detail and accepta
 
 - **Phase 0** ✅ — Scaffolding: package layout, CI, tooling.
 - **Phase 1** ✅ — MEPS ETL: verified data dictionary, cleaned panel (6,741 persons).
-- **Phase 2** ◐ — Models + full audit on MEPS (treatment proxy + `features`/`models`, in progress).
+- **Phase 2** ✅ — Models + full weighted, design-based audit on MEPS.
 - **Phase 3** ◐ — `riskaudit.audit` API done (~99% coverage); Synthea demo pending.
 - **Phase 4** — Release `v0.1.0` (bilingual README, CHANGELOG, Zenodo DOI).
 
