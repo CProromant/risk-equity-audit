@@ -97,3 +97,10 @@ def build_treatment_proxy(raw_dir: Path = RAW_DIR, out_path: Path | None = None)
     out.parent.mkdir(parents=True, exist_ok=True)
     pd.DataFrame({"person_id": sorted(ids), "treated_mh": 1}).to_parquet(out, index=False)
     return out
+
+
+def load_panel(processed_dir: Path = PROCESSED_DIR) -> pd.DataFrame:
+    """panel26 with the person-level mental-health treatment flag merged in."""
+    panel = pd.read_parquet(processed_dir / "panel26.parquet")
+    treat = pd.read_parquet(processed_dir / "treatment.parquet")
+    return panel.merge(treat, on="person_id", how="left").fillna({"treated_mh": 0})

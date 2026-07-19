@@ -35,7 +35,7 @@ category) or the Prescribed Medicines file (HC-229A) records a psychotropic (Mul
 classes for antidepressants, antipsychotics, anxiolytics/sedatives/hypnotics,
 antimanic, ADHD agents and psychotherapeutics; broad CNS catch-all classes excluded).
 The **untreated-distress** group is K6$_t \ge 13$ and not treated — a descriptive flag,
-never a target (§6). In the panel it is ~63 people.
+never a target (§6). In the panel it is ~63 people (40 in the K6-both-years analytic sample).
 
 ## 2. Contribution metric — incremental need lift in the low-score tail
 
