@@ -1,5 +1,5 @@
 # Windows: run these under Git Bash, or invoke the underlying scripts directly.
-.PHONY: download etl models audit chile demo all test lint format
+.PHONY: download etl models audit demo all test lint format
 
 all: download etl models audit
 
@@ -14,9 +14,6 @@ models:
 
 audit:
 	python scripts/run_audit.py
-
-chile:
-	python scripts/build_chile.py
 
 demo:
 	python demo/run_demo.py

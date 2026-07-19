@@ -24,7 +24,7 @@
 
 - **Nomenclatura de commits:** convencionales, en inglés (`feat:`, `fix:`, `docs:`, `test:`, `chore:`, `build:`, `ci:`). Un commit por unidad lógica.
 - **Ramas:** trabajo en `main` directo salvo que se pida PR (repo personal). Cada fase puede ir en su propio commit-set.
-- **Idioma:** código, docstrings, commits, nombres de archivo → inglés. `README` bilingüe (EN primero). Informes del módulo Chile → español. Este `PLAN.md` y `docs/decisions.md` → español (documento de trabajo del autor).
+- **Idioma:** código, docstrings, commits, nombres de archivo → inglés. `README` bilingüe (EN primero). Este `PLAN.md` y `docs/decisions.md` → español (documento de trabajo del autor).
 - **Antes de cada commit:** correr `ruff check`, `ruff format`, `pytest`, y revisar que `.gitignore` cubre `data/`, `artifacts/`, `*.dta`, `*.zip`, `*.parquet`.
 - **Determinismo:** todo script que use aleatoriedad recibe `seed=2026` desde un único lugar (`riskaudit._config.SEED`).
 
@@ -34,14 +34,14 @@
 
 > Estas deben quedar resueltas y registradas en `docs/decisions.md`. Las que afectan el modelado (D2, D3, D4) **bloquean la Fase 2**, no la Fase 0/1. Doy recomendación en cada una.
 >
-> **Estado (2026-07-18): D1–D5 RESUELTAS** y registradas en `docs/decisions.md` (detalle matemático en `docs/methods.md`). D2=equidad como argumento central; contribución = `incremental_lift`; D3=tuning por target; D4=estimación de dominio; D5=K6 continuo + umbral. D6 sin cambios. Las casillas de abajo quedan como referencia histórica.
+> **Estado (2026-07-18): D1–D5 RESUELTAS** y registradas en `docs/decisions.md` (detalle matemático en `docs/methods.md`). D2=equidad como argumento central; contribución = `incremental_lift`; D3=tuning por target; D4=estimación de dominio; D5=K6 continuo + umbral. **D6: el módulo Chile se descartó por completo** (ver `docs/decisions.md`). Las casillas de abajo quedan como referencia histórica.
 
 - [ ] **D1 — Nombre y ubicación del protocolo.** El protocolo asume llamarse `PROTOCOL.md`; hoy es `PROTOCOLO_risk-equity-audit.md`. **Recomendación:** renombrar a `PROTOCOL.md` y crear `CLAUDE.md` mínimo (ver Fase 0, tarea 0.1). *No bloquea nada, pero conviene cerrarlo primero.*
-- [ ] **D2 — El juicio normativo: ¿cuál es el label "correcto"?** Llamar "sesgado" a un modelo exige afirmar cuál es la vara de necesidad legítima. **Recomendación:** el label defendible NO es "K6 en abstracto", sino **gasto/utilización futura del grupo con distrés medido** (la tesis: distrés no tratado → gasto no psiquiátrico en t+1). K6 se usa como *definición del grupo* y como uno de los targets de comparación, no como "la verdad" única. Documentar esta postura explícitamente en `docs/methods.md` **antes** de correr la auditoría. *(Deriva de la crítica: sin esto, un revisor marca el argumento como circular.)*
+- [ ] **D2 — El juicio normativo: ¿cuál es el label "correcto"?** Llamar "sesgado" a un modelo exige afirmar cuál es la vara de necesidad legítima. **Recomendación:** el label defendible NO es "K6 en abstracto", sino **gasto/utilización futura del grupo con distrés medido** (la idea: distrés no tratado → gasto no psiquiátrico en t+1). K6 se usa como *definición del grupo* y como uno de los targets de comparación, no como "la verdad" única. Documentar esta postura explícitamente en `docs/methods.md` **antes** de correr la auditoría. *(Deriva de la crítica: sin esto, un revisor marca el argumento como circular.)*
 - [ ] **D3 — Hiperparámetros: ¿idénticos o por target?** El protocolo pide HP idénticos para los 3 targets. **Recomendación:** mantener **misma clase de modelo y mismas features** (eso es lo que da comparabilidad), pero **tunear HP ligeramente por target** con la misma rutina de CV. Forzar HP idénticos puede handicapear un target y sesgar la comparación que es el núcleo del trabajo. Si se conserva la regla del protocolo, justificar por qué en `methods.md`. *(Deriva de la crítica.)*
 - [ ] **D4 — Estimación de subpoblación (dominio), no filtrar-y-repesar.** Al analizar el subconjunto "panel completo ∩ SAQ ambos años ∩ K6 válido", NO filtrar el dataset y correr el diseño muestral sobre lo filtrado (rompe la varianza). Usar **domain/subpopulation estimation** manteniendo el marco muestral completo. **Recomendación:** fijarlo como método estándar del proyecto en `methods.md`. *(Deriva de la crítica; trampa clásica de MEPS.)*
 - [ ] **D5 — "Necesidad" ordinal vs cardinal.** Sumar K6 como "masa de necesidad" en `top_k_capture` trata lo ordinal como cardinal. **Recomendación:** reportar dos operacionalizaciones de necesidad — (a) K6 continuo y (b) umbral K6≥13 (binaria) — como análisis de robustez. Decidir cuál es la principal.
-- [ ] **D6 — Alcance de v0.1 si el tiempo aprieta.** Chile y el demo son los más desprendibles y no aportan *evidencia* al claim central. **Recomendación:** orden de sacrificio si hay que recortar → primero posponer análisis avanzados (ya en backlog), luego el módulo Chile completo (dejar 1 figura de motivación), nunca tocar `riskaudit.audit` ni el estudio MEPS. Confirmar el orden.
+- [x] **D6 — Alcance de v0.1 (resuelta).** El módulo Chile se descartó por completo (no aportaba evidencia al claim central; el producto es la herramienta). Orden de sacrificio si aprieta el tiempo → primero posponer análisis avanzados (backlog), luego el demo Synthea, nunca tocar `riskaudit.audit` ni el estudio MEPS.
 
 ---
 
@@ -49,14 +49,11 @@
 
 ```
 F0 Andamiaje ─┬─> F1 ETL MEPS ──> F2 Modelos+Auditoría ─┐
-              │                                          ├─> F5 Release
-              └─> F3 Paquete+Demo (audit + Synthea) ─────┤
-                                                          │
-                            F4 Chile (independiente) ─────┘
+              │                                          ├─> F4 Release
+              └─> F3 Paquete+Demo (audit + Synthea) ─────┘
 ```
 
 - **F3 (paquete `audit` + demo)** puede empezar en paralelo a F1/F2 porque `riskaudit.audit` se desarrolla y testea con **datos sintéticos de resultado conocido**, sin depender de MEPS. *Recomendación:* desarrollar `audit/` temprano; F2 solo lo *consume*.
-- **F4 (Chile)** es independiente de todo lo de MEPS; puede intercalarse.
 
 ---
 
@@ -81,8 +78,8 @@ F0 Andamiaje ─┬─> F1 ETL MEPS ──> F2 Modelos+Auditoría ─┐
 ### 0.3 Estructura de paquetes (esqueleto)
 - [ ] Crear el árbol de la sección 2 del protocolo con `__init__.py` en cada subpaquete y funciones/clases *stub* que hagan `raise NotImplementedError` o retornen tipos vacíos, con firma y docstring ya escritos.
 - [ ] `src/riskaudit/_config.py` con `SEED = 2026` y rutas base (`DATA_DIR`, `ARTIFACTS_DIR`) leídas de forma portable (Windows/Linux).
-- [ ] `data/` con subcarpetas `raw/ processed/ chile/ synthetic/` y un `.gitkeep` en cada una (las carpetas se versionan vacías; el contenido no).
-- **DoD:** `python -c "import riskaudit; import riskaudit.audit; import riskaudit.etl; import riskaudit.chile"` corre sin error.
+- [ ] `data/` con subcarpetas `raw/ processed/ synthetic/` y un `.gitkeep` en cada una (las carpetas se versionan vacías; el contenido no).
+- **DoD:** `python -c "import riskaudit; import riskaudit.audit; import riskaudit.etl"` corre sin error.
 
 ### 0.4 `.gitignore`
 - [ ] Ignorar `data/`, `artifacts/`, `*.dta`, `*.zip`, `*.parquet`, además de lo estándar Python (`__pycache__/`, `*.egg-info/`, `.pytest_cache/`, `.ruff_cache/`, `.coverage`, `htmlcov/`, `.venv/`), y `desktop.ini`, `Thumbs.db` (entorno Windows/OneDrive).
@@ -90,8 +87,8 @@ F0 Andamiaje ─┬─> F1 ETL MEPS ──> F2 Modelos+Auditoría ─┐
 - **DoD:** `git status` no lista ningún dato/artefacto; `git check-ignore data/raw/foo.dta` responde afirmativo.
 
 ### 0.5 `Makefile`
-- [ ] Targets: `download`, `etl`, `models`, `audit`, `chile`, `demo`, `all`, `test`, `lint`, `format`. Cada uno llama a un entrypoint fino en `scripts/`.
-- [ ] `all = download etl models audit` (Chile y demo aparte). `test = pytest`. En Windows documentar alternativa (`make` vía Git Bash, o un `tasks.ps1` espejo si hace falta — decidir en 0.5).
+- [ ] Targets: `download`, `etl`, `models`, `audit`, `demo`, `all`, `test`, `lint`, `format`. Cada uno llama a un entrypoint fino en `scripts/`.
+- [ ] `all = download etl models audit` (demo aparte). `test = pytest`. En Windows documentar alternativa (`make` vía Git Bash, o un `tasks.ps1` espejo si hace falta — decidir en 0.5).
 - **DoD:** `make test` (o equivalente) corre pytest; `make lint` corre ruff.
 
 ### 0.6 Pre-commit
@@ -195,7 +192,7 @@ F0 Andamiaje ─┬─> F1 ETL MEPS ──> F2 Modelos+Auditoría ─┐
 
 ### 2.5 `docs/methods.md`
 - [ ] Definición matemática exacta de cada métrica de `audit`.
-- [ ] Justificación del juicio normativo (**D2**), del método de varianza/dominio (**D4**), de HP (**D3**), y de por qué el módulo Chile es triangulación y no modelo.
+- [ ] Justificación del juicio normativo (**D2**), del método de varianza/dominio (**D4**), de HP (**D3**).
 - **DoD:** cada métrica del informe tiene su definición trazable aquí.
 
 ### 2.6 Informe HTML MEPS
@@ -255,59 +252,33 @@ Para cada función: firma estable, docstring con **definición matemática exact
 
 ---
 
-# FASE 4 — Módulo Chile (triangulación descriptiva)
-
-**Objetivo:** 4 figuras + 1 tabla país, cada una con fuente citada al pie.
-**AC de la fase:** `make chile` produce las 4 figuras + tabla · `docs/methods.md` explica por qué es triangulación y no modelo.
-
-> **Recordatorio de encuadre (deriva de la crítica):** el módulo Chile *motiva* y da relevancia local; **no** valida el hallazgo MEPS (no hay microdato chileno que cruce síntomas con gasto individual). El README debe decirlo así.
-
-### 4.1 `chile/parsers.py` — parsers tolerantes
-- [ ] Fuentes: ENS 2016-17 (MINSAL), Termómetro ACHS-UC (agregados de informes; el microdato lo gestiona el humano), Glosa 06 (listas de espera), DEIS (egresos F00–F99), SUSESO (licencias por trastornos mentales), CASEN 2022 (gradiente socioeconómico).
-- [ ] Descargas simples con `requests`. Si un sitio bloquea o el formato Excel/PDF es caótico: **paso manual documentado** ("descargar X → guardar en `data/chile/`"), no scraping agresivo (guardrail 6).
-- **DoD:** cada fuente usada tiene su parser o su instrucción de descarga manual registrada.
-
-### 4.2 `chile/figures.py` — las 4 figuras + tabla
-- [ ] **Fig 1:** prevalencia de síntomas depresivos (ENS 15,8%; serie Termómetro 2020–2025) vs población en tratamiento.
-- [ ] **Fig 2:** brecha de acceso (Termómetro R11: 69,7% sin ayuda ≈ 1,3 M personas), desagregada si el informe lo permite.
-- [ ] **Fig 3:** licencias médicas por trastornos mentales como % del total (serie SUSESO; 33,1% en 2024).
-- [ ] **Fig 4:** salud mental en listas de espera GES (Glosa 06, último trimestre disponible).
-- [ ] **Tabla país:** síntomas medidos vs tratamiento vs listas de espera vs licencias.
-- [ ] Cada figura/tabla con **fuente citada al pie** (guardrail: no sobre-afirmar).
-- **DoD:** `scripts/build_chile.py` (`make chile`) genera las 4 figuras + tabla en `artifacts/`.
-
-### 🔒 Cierre Fase 4
-- [ ] Resumen de cierre + **detener**.
-
----
-
-# FASE 5 — Release v0.1.0
+# FASE 4 — Release v0.1.0
 
 **Objetivo:** repo publicable, README bilingüe completo, tag y archivado.
 **AC de la fase:** README bilingüe completo (qué es, instalación, quickstart, hallazgos con 2 figuras, datos, limitaciones, cómo citar) · CHANGELOG · tag `v0.1.0` · instrucciones de archivado Zenodo escritas · sección "How to cite".
 
-### 5.1 README bilingüe final
-- [ ] EN primero, ES después. Secciones: What it is / Install / Quickstart / **Findings (con 2 figuras clave)** / Data (fuentes y que NO van en git) / **Limitations** (n del subgrupo severo, Chile es descriptivo, label choice es un juicio normativo) / How to cite.
+### 4.1 README bilingüe final
+- [ ] EN primero, ES después. Secciones: What it is / Install / Quickstart / **Findings (con 2 figuras clave)** / Data (fuentes y que NO van en git) / **Limitations** (n del subgrupo severo, label choice es un juicio normativo) / How to cite.
 - **DoD:** un tercero puede instalar y correr el demo solo con el README.
 
-### 5.2 CHANGELOG y versión
+### 4.2 CHANGELOG y versión
 - [ ] `CHANGELOG.md` con la v0.1.0. Versión en `pyproject.toml` = `0.1.0`.
 - **DoD:** versión consistente entre changelog, pyproject y tag.
 
-### 5.3 Zenodo + cita
+### 4.3 Zenodo + cita
 - [ ] Instrucciones de archivado en Zenodo escritas (la cuenta/DOI la conecta el humano). Sección "How to cite" con formato de cita provisional (DOI a completar).
 - **DoD:** documentado; nada que requiera credenciales queda a cargo de Claude Code.
 
-### 5.4 Backlog → issues
-- [ ] Crear issues de GitHub para el backlog del protocolo §7 (pooling paneles 24–27; two-part/GLM gamma; `fairlearn`; CLI; dashboard Chile; CMS Synthetic RIF; mkdocs; preprint Quarto).
+### 4.4 Backlog → issues
+- [ ] Crear issues de GitHub para el backlog del protocolo §7 (pooling paneles 24–27; two-part/GLM gamma; `fairlearn`; CLI; CMS Synthetic RIF; mkdocs; preprint Quarto).
 - **DoD:** issues creados y etiquetados.
 
-### 5.5 Tag y verificación final
+### 4.5 Tag y verificación final
 - [ ] `make all` reproduce resultados MEPS con seed fijo; CI verde; `.gitignore` confirmado sin datos.
 - [ ] Tag `v0.1.0`.
 - **DoD:** release listo; checklist de AC de todas las fases en verde.
 
-### 🔒 Cierre Fase 5
+### 🔒 Cierre Fase 4
 - [ ] Resumen final del proyecto.
 
 ---
@@ -320,19 +291,17 @@ Para cada función: firma estable, docstring con **definición matemática exact
 | R2 | Subgrupo severo aún más chico que ~45 | N tras filtros | reforzar "solo descriptivo, IC anchos"; nunca modelar; ajustar narrativa |
 | R3 | Varianza mal estimada por filtrar-y-repesar | IC implausiblemente angostos | D4: estimación de dominio con marco completo |
 | R4 | Ablación de T3 leída como hallazgo (circular) | AUC de K6_t1 dominado por K6_t | enfocar el claim en T1/T2; documentar la tautología de T3 |
-| R5 | Parsers Chile frágiles (PDF/Excel MINSAL/SUSESO) | parser rompe | paso manual documentado, sin scraping agresivo |
-| R6 | Alcance v0.1 se pasa de tiempo | fases atrasadas | D6: sacrificar en orden Chile/demo, nunca `audit`/MEPS |
-| R7 | Datos filtrados a git | `git status` lista `.dta`/`.parquet` | revisar `.gitignore` antes de cada commit (guardrail 5) |
-| R8 | Sobre-afirmar el "encontramos invisibles" | lenguaje causal fuerte con n chico | encuadre: hallazgo = mecanismo poblacional, no anécdota |
+| R5 | Alcance v0.1 se pasa de tiempo | fases atrasadas | D6: sacrificar el demo antes que nada, nunca `audit`/MEPS |
+| R6 | Datos filtrados a git | `git status` lista `.dta`/`.parquet` | revisar `.gitignore` antes de cada commit (guardrail 5) |
+| R7 | Sobre-afirmar el "encontramos invisibles" | lenguaje causal fuerte con n chico | encuadre: hallazgo = mecanismo poblacional, no anécdota |
 
 ## 5. Checklist maestro de AC (una vista)
 
 - [x] F0: `pip install -e ".[dev]"` ok · `pytest` verde · pre-commit activo · CI (confirmar verde en Actions)
 - [x] F1: N panel = 6.741 (3.001 adultos K6 ambos años) documentado · `dictionary.yml` verificado · tests esquema/rango · perfilado en `artifacts/`
 - [ ] F2: `make models && make audit` reproducible · informe con las 5 piezas · todo ponderado · severo solo descriptivo
-- [~] F3: **`audit/` implementado** (6 funciones, 17 tests, cobertura 99%) · falta demo Synthea + ejemplo de API en README
-- [ ] F4: `make chile` → 4 figuras + tabla con fuentes · `methods.md` explica la triangulación
-- [ ] F5: README bilingüe completo · CHANGELOG · tag `v0.1.0` · Zenodo/cita · backlog en issues
+- [~] F3: **`audit/` implementado** (7 funciones, 20 tests, cobertura 99%) · falta demo Synthea + ejemplo de API en README
+- [ ] F4: README bilingüe completo · CHANGELOG · tag `v0.1.0` · Zenodo/cita · backlog en issues
 - [x] Transversal: métrica `incremental_lift` (contribución propia, `methods.md` §2) ✅ · **bootstrap de diseño VARSTR/VARPSU** ✅ (`SurveyDesign`; en el lift real el efecto de diseño ≈1, el hallazgo aguanta). Pendiente: cablearlos en el pipeline MEPS de la Fase 2.
 
 ---

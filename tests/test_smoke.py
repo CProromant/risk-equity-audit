@@ -13,6 +13,6 @@ def test_version_is_dev_prerelease():
     assert __version__ == "0.1.0.dev0"
 
 
-@pytest.mark.parametrize("name", ["riskaudit.audit", "riskaudit.etl", "riskaudit.chile"])
+@pytest.mark.parametrize("name", ["riskaudit.audit", "riskaudit.etl"])
 def test_subpackage_imports(name):
     assert importlib.import_module(name) is not None

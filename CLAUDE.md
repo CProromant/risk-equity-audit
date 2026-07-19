@@ -82,4 +82,4 @@ Formatter-enforced consistency (ruff) is normal for humans too. Keep it.
 
 Self-check before closing any file
 
-Read it once asking: is there any line whose existence could only be explained with "the tool put it there"? If yes, delete or rewrite until every line has a reason the author can state out loud — in a code review or a thesis defense.
+Read it once asking: is there any line whose existence could only be explained with "the tool put it there"? If yes, delete or rewrite until every line has a reason the author can state out loud — in a code review.

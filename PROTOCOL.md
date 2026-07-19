@@ -10,16 +10,15 @@
 
 ## 0. Qué es esto y por qué existe
 
-**Tesis en una frase:** los modelos de estratificación de riesgo entrenados con gasto sanitario son ciegos *por construcción* a las personas con distrés psíquico que no consultan (gasto observado = 0), aunque esa población genera gasto médico no psiquiátrico al año siguiente. Este proyecto lo mide con MEPS y empaqueta la auditoría como herramienta reutilizable.
+**La idea en una frase:** los modelos de estratificación de riesgo entrenados con gasto sanitario son ciegos *por construcción* a las personas con distrés psíquico que no consultan (gasto observado = 0), aunque esa población genera gasto médico no psiquiátrico al año siguiente. Este proyecto lo mide con MEPS y empaqueta la auditoría como herramienta reutilizable.
 
 **Producto final (release v0.1.0):**
 1. Paquete Python instalable **`riskaudit`**: auditoría de sesgo por elección de etiqueta (label-choice bias, estilo Obermeyer et al. 2019) aplicable a cualquier modelo de estratificación de riesgo.
-2. Pipeline reproducible **MEPS 2021–2023** que implementa la tesis: tres targets, modelos idénticos, auditoría completa.
-3. **Módulo Chile**: triangulación descriptiva de la brecha (síntomas medidos vs tratamiento vs listas de espera vs licencias médicas).
-4. **Demo end-to-end** sobre datos sintéticos (Synthea), ejecutable en <10 minutos, sin credenciales ni PHI.
-5. Repo público con CI verde, README bilingüe (EN primero, ES después), DOI de Zenodo en el release.
+2. Pipeline reproducible **MEPS 2021–2023** que implementa la idea: tres targets, modelos idénticos, auditoría completa.
+3. **Demo end-to-end** sobre datos sintéticos (Synthea), ejecutable en <10 minutos, sin credenciales ni PHI.
+4. Repo público con CI verde, README bilingüe (EN primero, ES después), DOI de Zenodo en el release.
 
-**Usos del repo (contexto para resolver trade-offs):** tesis de magíster reproducible; portafolio para cargos de gestión poblacional / RWE; trabajo público para afiliación ML Collective; base del preprint. Prioridad ante cualquier conflicto: **correcto > reproducible > usable por terceros > bonito**.
+**Usos del repo (contexto para resolver trade-offs):** proyecto personal / portafolio para cargos de gestión poblacional / RWE; trabajo público para afiliación ML Collective; base de un posible preprint. Prioridad ante cualquier conflicto: **correcto > reproducible > usable por terceros > bonito**.
 
 ---
 
@@ -39,7 +38,7 @@
 | Calidad | ruff (lint + format) + pre-commit |
 | CI | GitHub Actions: lint + tests en Python 3.11 y 3.12 |
 | Licencia | MIT |
-| Idiomas | código, docstrings, commits: inglés. README bilingüe. Informes del módulo Chile: español |
+| Idiomas | código, docstrings, commits: inglés. README bilingüe |
 | Datos en git | **PROHIBIDO**. Todo `data/` en `.gitignore`; se versionan solo scripts de descarga y checksums (`data/checksums.txt`) |
 | Determinismo | seed global = 2026; resultados finales reproducibles con `make all` |
 
@@ -54,7 +53,7 @@ risk-equity-audit/
 ├── README.md                  # bilingüe: EN, luego ES
 ├── LICENSE
 ├── pyproject.toml
-├── Makefile                   # download / etl / models / audit / chile / demo / all / test
+├── Makefile                   # download / etl / models / audit / demo / all / test
 ├── .gitignore                 # data/, artifacts/, *.dta, *.zip, *.parquet
 ├── .github/workflows/ci.yml
 ├── src/riskaudit/
@@ -65,16 +64,14 @@ risk-equity-audit/
 │   │   └── dictionary.yml     # variable → archivo → página del codebook (VERIFICADO)
 │   ├── features.py            # matriz X_t y los tres targets t+1
 │   ├── models.py              # entrenamiento idéntico por target
-│   ├── audit/                 # ← EL PAQUETE PÚBLICO
-│   │   ├── capture.py
-│   │   ├── reclassification.py
-│   │   ├── ablation.py
-│   │   ├── curves.py          # label_choice_curve estilo Obermeyer
-│   │   ├── rtm.py             # regresión a la media
-│   │   └── report.py          # informe HTML autocontenido
-│   └── chile/
-│       ├── parsers.py         # Glosa 06, DEIS, SUSESO, ENS, Termómetro
-│       └── figures.py
+│   └── audit/                 # ← EL PAQUETE PÚBLICO
+│       ├── capture.py
+│       ├── reclassification.py
+│       ├── ablation.py
+│       ├── curves.py          # label_choice_curve
+│       ├── lift.py            # incremental_lift (métrica-contribución)
+│       ├── rtm.py             # regresión a la media
+│       └── report.py          # informe HTML autocontenido
 ├── scripts/                   # entrypoints finos que llaman al paquete
 ├── demo/
 │   ├── run_demo.py            # Synthea → modelo de costo → auditoría → HTML
@@ -84,7 +81,7 @@ risk-equity-audit/
 │   ├── methods.md             # definiciones matemáticas y decisiones estadísticas
 │   └── decisions.md           # registro de desviaciones respecto a este protocolo
 ├── data/                      # NO versionado
-│   ├── raw/ processed/ chile/ synthetic/
+│   ├── raw/ processed/ synthetic/
 └── artifacts/                 # modelos, predicciones, figuras (NO versionado)
 ```
 
@@ -99,7 +96,7 @@ risk-equity-audit/
 | **HC-233** | Full-Year Consolidated 2021: gasto, utilización, SAQ (K6, PHQ-2) | https://meps.ahrq.gov/data_stats/download_data/pufs/h233/h233doc.shtml |
 | **HC-243** | Full-Year Consolidated 2022 | https://meps.ahrq.gov/data_stats/download_data/pufs/h243/h243doc.pdf |
 | **HC-251** | Full-Year Consolidated 2023 (publicado ago-2025) | https://meps.ahrq.gov/data_stats/download_data/pufs/h251/h251doc.shtml |
-| **HC-244** | **Panel 26 Longitudinal 2021–2022** (2.737 variables; el archivo central de la tesis; incluye `LONGWT` y el peso longitudinal del SAQ `LSAQWT`) | https://www.meps.ahrq.gov/mepsweb/data_stats/download_data/pufs/h244/h244doc.pdf |
+| **HC-244** | **Panel 26 Longitudinal 2021–2022** (2.737 variables; el archivo central del estudio MEPS; incluye `LONGWT` y el peso longitudinal del SAQ `LSAQWT`) | https://www.meps.ahrq.gov/mepsweb/data_stats/download_data/pufs/h244/h244doc.pdf |
 | **HC-231** | 2021 Medical Conditions (`ICD10CDX`, `CCSR1X-3X`); define el proxy de tratamiento de salud mental | https://meps.ahrq.gov/data_stats/download_data/pufs/h231/h231doc.shtml |
 | **HC-229A** | 2021 Prescribed Medicines (clase terapéutica Multum `TC1*`); psicofármacos para el proxy de tratamiento | https://meps.ahrq.gov/data_stats/download_data/pufs/h229a/h229adoc.shtml |
 
@@ -108,27 +105,12 @@ risk-equity-audit/
 - Explorador de variables: https://datatools.ahrq.gov/meps-hc#varExp
 - Contexto de tamaño muestral (ya calculado en la fase de diseño): completan las 5 rondas del panel ≈ 5.700 personas; adultos con K6 en ambos años ≈ 2.900; K6 ≥ 13 ≈ 95; K6 ≥ 13 sin tratamiento ≈ 45. **Consecuencia de diseño (fija): el subgrupo severo se analiza descriptivamente, no se modela.** El target de salud mental es K6 continuo.
 
-### 3.2 Módulo Chile
-
-| Fuente | Contenido | Acceso |
-|---|---|---|
-| **ENS 2016-17** (MINSAL) | Prevalencias nacionales (síntomas depresivos 15,8%), módulo CIDI, base de medicamentos | Bases F1-F2 y F4 + documentación, descarga libre: http://epi.minsal.cl/bases-de-datos/ |
-| **Termómetro de Salud Mental ACHS-UC** | Panel longitudinal 2020→2025 (11 rondas), PHQ-9, GAD-7, GHQ-12, AUDIT-C; ronda 11: 69,7% de quienes tuvieron problemas de salud mental no buscó o no pudo acceder a ayuda (~1,3 M personas) | Informes: https://www.achs.cl/termometro-salud-mental · Microdatos depositados en el repositorio de Datos de Investigación UC (buscar "Termómetro de la Salud Mental", PI David Bravo): https://datosinvestigacion.repositorio.uc.cl — **el acceso al microdato puede requerir solicitud; eso lo gestiona el humano, no Claude Code. Para v0.1 basta con los agregados de los informes.** |
-| **Listas de espera GES/no-GES (Glosa 06)** | Informes trimestrales, incluido 1er trimestre 2026 | https://www.minsal.cl/eje-tiempos-de-espera/ |
-| **DEIS MINSAL** | Microdatos anonimizados de egresos hospitalarios 2001–2023 (CIE-10 → filtrar F00–F99), atenciones de urgencia, REM, defunciones | Sección datos abiertos: https://deis.minsal.cl |
-| **SUSESO** | Licencias médicas Fonasa + Isapre; trastornos mentales = 33,1% de las emitidas en 2024, primera causa | Estadísticas interactivas y informes anuales: https://www.suseso.cl (agregados descargables; no hay microdato individual) |
-| **CASEN 2022** (y serie hasta 2024) | Microdatos libres; módulo salud (atención y tratamiento) + ingresos, para el gradiente socioeconómico | https://observatorio.ministeriodesarrollosocial.gob.cl/encuesta-casen |
-
-### 3.3 Sintéticos (para el demo)
+### 3.2 Sintéticos (para el demo)
 
 | Fuente | Uso | Acceso |
 |---|---|---|
 | **Synthea** (MITRE) | Cohorte sintética CSV para el demo (muestra de 1.000 pacientes basta) | Descargas: https://synthea.mitre.org/downloads · Generador: https://github.com/synthetichealth/synthea |
 | **CMS Synthetic Medicare** (opcional, backlog) | Claims sintéticos formato RIF | https://data.cms.gov/collection/synthetic-medicare-enrollment-fee-for-service-claims-and-prescription-drug-event |
-
-### 3.4 Lo que NO existe (y define el diseño)
-
-No hay microdato chileno que vincule síntomas medidos con gasto individual (no existe un "MEPS chileno"). Por eso el módulo Chile es **triangulación descriptiva por diseño**. No intentar entrenar modelos con datos chilenos; documentar esta limitación en el README como parte del argumento.
 
 ---
 
@@ -197,16 +179,7 @@ audit_report(results, out_html) -> Path
 
 Requisitos: docstring con definición matemática exacta de cada métrica; soporte de `weights` en todas; tests unitarios con datos sintéticos de resultado conocido a mano; IC por bootstrap donde aplique —de diseño (remuestreo de PSU dentro de estratos VARSTR/VARPSU) en los resultados MEPS.
 
-### 4.5 `riskaudit.chile`
-
-Entregable: `scripts/build_chile.py` produce 4 figuras + 1 tabla país, cada una con la fuente citada en el pie:
-1. Prevalencia de síntomas depresivos (ENS 15,8%; Termómetro serie 2020–2025) vs población en tratamiento.
-2. Brecha de acceso: 69,7% sin ayuda ≈ 1,3 M personas (Termómetro R11), desagregado si el informe lo permite.
-3. Licencias médicas por trastornos mentales como % del total (serie SUSESO; 33,1% en 2024).
-4. Salud mental en listas de espera GES (Glosa 06, último trimestre disponible).
-Parsers tolerantes: los archivos MINSAL/SUSESO son Excel/PDF heterogéneos; si un parser automático es frágil, aceptar un paso manual documentado ("descargar X, guardarlo en `data/chile/`") antes que scraping frágil.
-
-### 4.6 `demo/`
+### 4.5 `demo/`
 
 Guion de `run_demo.py`, ejecutable end-to-end en <10 min:
 1. Descarga (o usa cacheada) la muestra Synthea de 1.000 pacientes en CSV.
@@ -231,10 +204,7 @@ AC: `make models && make audit` reproduce `metrics.json` y las figuras con seed 
 **Fase 3 — Paquete + demo (3–4 días).** API `riskaudit.audit` estable, docstrings, demo Synthea.
 AC: cobertura ≥90% en `audit/`; `python demo/run_demo.py` corre limpio en un entorno recién creado y produce el HTML; README documenta la API con un ejemplo mínimo de 15 líneas.
 
-**Fase 4 — Chile (3–4 días).**
-AC: `make chile` produce las 4 figuras + tabla con fuentes en el pie; `docs/methods.md` explica por qué es triangulación y no modelo.
-
-**Fase 5 — Release (1–2 días).**
+**Fase 4 — Release (1–2 días).**
 AC: README bilingüe completo (qué es, instalación, quickstart, hallazgos con 2 figuras, datos, limitaciones, cita); CHANGELOG; tag `v0.1.0`; instrucciones de archivado en Zenodo escritas (la cuenta la conecta el humano); sección "How to cite".
 
 ---
@@ -246,7 +216,7 @@ AC: README bilingüe completo (qué es, instalación, quickstart, hallazgos con 
 3. **Pesos y varianza siempre** en resultados finales. Está permitido explorar sin pesos, prohibido reportar sin pesos.
 4. **No sobre-afirmar con n chico**: el grupo severo lleva IC anchos y lenguaje descriptivo.
 5. **Nada de datos en git**: ni microdatos, ni parquets, ni zips. Revisar `.gitignore` antes de cada commit.
-6. **Sitios chilenos**: descargas simples con `requests`; si un sitio bloquea o el formato es caótico, pedir descarga manual al humano en vez de scraping agresivo.
+6. **Sitios que bloquean o con formato caótico**: descargas simples con `requests`; si un sitio bloquea o el formato es caótico, pedir descarga manual al humano en vez de scraping agresivo.
 7. **Commits convencionales** en inglés (`feat:`, `fix:`, `docs:`, `test:`); commits pequeños por unidad lógica.
 8. **Al cerrar cada fase**: resumen de lo hecho, AC cumplidos, pendientes y decisiones tomadas. No avanzar de fase con AC en rojo.
 9. **Volumen**: los archivos MEPS son de decenas de MB; procesar en memoria con pandas está bien; no introducir Spark/Dask.
@@ -255,7 +225,7 @@ AC: README bilingüe completo (qué es, instalación, quickstart, hallazgos con 
 
 ## 7. Backlog explícito (NO hacer en v0.1)
 
-Pooling de paneles 24–27; two-part models / GLM gamma para gasto; integración con `fairlearn`; CLI (`riskaudit audit ...`); dashboard interactivo del módulo Chile; conversión del demo a CMS Synthetic RIF; sitio de docs (mkdocs); manuscrito/preprint en Quarto. Anotarlos como issues de GitHub al final de la Fase 5.
+Pooling de paneles 24–27; two-part models / GLM gamma para gasto; integración con `fairlearn`; CLI (`riskaudit audit ...`); conversión del demo a CMS Synthetic RIF; sitio de docs (mkdocs); manuscrito/preprint en Quarto. Anotarlos como issues de GitHub al final de la Fase 4.
 
 ---
 
