@@ -18,11 +18,11 @@
 
 Health systems have limited budgets for expensive programs — case management, home visits, close follow-up — so a model decides **who gets prioritized**, usually by predicting who is "high risk." The catch is *how you define* high risk. Most deployed models define it as **"who will spend the most,"** because spending is recorded for everyone.
 
-That choice has a blind spot. Consider someone in psychological distress who **does not seek care**: their observed spending is near zero, so a spend-trained model labels them *low risk* and ignores them — even though untreated distress tends to surface next year as non-psychiatric medical spending (ER visits, worsened physical illness). The need was there; the model was blind to it **by construction**.
+That choice has a blind spot. Consider someone in psychological distress who **does not seek care**: their observed spending is near zero, so a spend-trained model labels them *low risk* and ignores them — and the concern is that untreated distress may surface next year as other medical need (ER visits, worsened physical illness). The need was there; the label never looked for it.
 
 This is **label-choice bias**: a well-documented failure where an algorithm trained on cost as a proxy for need under-serves people whose need hasn't yet turned into spending. This project applies that lens to **untreated mental-health need** and packages the audit as a reusable tool.
 
-**The claim in one sentence:** risk-stratification models trained on healthcare spending are blind *by construction* to people with psychological distress who do not seek care (observed spend = 0), even though that population generates non-psychiatric medical spending the following year — and this project measures it.
+**The claim in one sentence:** a risk model trained on healthcare spending captures barely more measured need than a coin flip and systematically under-serves people in psychological distress — because the *label* (spending), not the algorithm, decides who counts as high risk. This project measures that label-choice cost on MEPS.
 
 ---
 
@@ -50,7 +50,9 @@ Because it works purely on scores and a need measure, `riskaudit` is **domain- a
 | `incremental_lift(y_t1, y_pred, distress, scores, k, weights)` | **The contribution metric:** among people the model deprioritizes, do those with measured need generate *more future outcome than predicted* than the rest? Makes the argument non-circular. |
 | `audit_report(results, out_html)` | Bundles everything into a self-contained HTML report. |
 
-**The core, non-circular result** the audit surfaces: among the people a spend model deprioritizes, those in measured distress go on to generate medical spending *above what the model predicted* — need it was blind to, measured in the model's own currency (not the distress score, so the finding isn't circular). A companion contrast: removing all mental-health features barely moves a spend model's global AUC/R², yet it collapses its capture of measured need. Both are estimated on the whole weighted population, not the small severe-untreated subgroup (reported descriptively only). *An early estimate on the MEPS panel gives a positive lift whose 95% CI excludes zero and survives design-based variance; the fully modeled result is Phase 2.*
+**What the audit finds on MEPS** (weighted, with design-based confidence intervals): the spend-trained model captures only ~15% of top-decile K6 need — barely above the ~10% a random score gets, and far below the ~41% an oracle (ranking by need itself) reaches; a need-trained model reaches ~29%. Among the people the spend model deprioritizes, those in distress run up more *total* future cost than it predicted (incremental lift +0.8 log-dollars with the mental-health features, +1.0 without — both 95% CIs exclude zero), so the bias comes from the **label, not from missing information**.
+
+**Honest limit.** That excess does **not** appear on non-psychiatric utilization (ER + hospitalizations; lift ≈ 0, CI includes zero), so we do *not* claim the distress surfaces specifically as non-psychiatric spending — the total-spend excess may be partly mental-health spending, and a clean test needs a non-psychiatric spend target (backlog). The severe-untreated subgroup (n ≈ 40) is descriptive only.
 
 ---
 
@@ -147,11 +149,11 @@ A citation with a Zenodo DOI will be added at release. For now, please cite the 
 
 Los sistemas de salud tienen presupuesto limitado para programas caros —gestión de caso, visitas domiciliarias, seguimiento cercano— así que un modelo decide **a quién se prioriza**, normalmente prediciendo quién es "de alto riesgo". El problema está en *cómo se define* ese alto riesgo. La mayoría de los modelos desplegados lo definen como **"quién va a gastar más"**, porque el gasto está registrado para todos.
 
-Esa elección tiene un punto ciego. Pensemos en una persona con distrés psíquico que **no consulta**: su gasto observado es casi cero, así que un modelo entrenado con gasto la etiqueta como *bajo riesgo* y la ignora — aunque el distrés no tratado suele reaparecer al año siguiente como gasto médico no psiquiátrico (urgencias, enfermedades físicas agravadas). La necesidad estaba; el modelo fue ciego a ella **por construcción**.
+Esa elección tiene un punto ciego. Pensemos en una persona con distrés psíquico que **no consulta**: su gasto observado es casi cero, así que un modelo entrenado con gasto la etiqueta como *bajo riesgo* y la ignora — y la inquietud es que el distrés no tratado pueda reaparecer al año siguiente como otra necesidad médica (urgencias, enfermedades físicas agravadas). La necesidad estaba; la etiqueta nunca la buscó.
 
 Esto es el **sesgo por elección de la etiqueta**: una falla bien documentada en la que un algoritmo entrenado con el costo como proxy de necesidad sub-atiende a quienes su necesidad aún no se tradujo en gasto. Este proyecto aplica esa mirada a la **necesidad de salud mental no tratada** y empaqueta la auditoría como herramienta reutilizable.
 
-**La idea en una frase:** los modelos de estratificación de riesgo entrenados con gasto sanitario son ciegos *por construcción* a las personas con distrés psíquico que no consultan (gasto observado = 0), aunque esa población genera gasto médico no psiquiátrico al año siguiente — y este proyecto lo mide.
+**La idea en una frase:** un modelo de riesgo entrenado con gasto sanitario captura la necesidad medida apenas por encima del azar y sub-atiende sistemáticamente a las personas con distrés psíquico — porque es la *etiqueta* (el gasto), no el algoritmo, la que decide quién es de alto riesgo. Este proyecto mide ese costo de la elección de etiqueta con MEPS.
 
 ## Qué incluye
 
@@ -175,7 +177,9 @@ Como trabaja solo con puntajes y una medida de necesidad, `riskaudit` es **agnó
 | `incremental_lift` | **La métrica-contribución:** entre los que el modelo deprioriza, ¿los que tienen necesidad medida generan *más desenlace futuro del predicho* que el resto? Hace no-circular el argumento. |
 | `audit_report` | Empaqueta todo en un informe HTML autocontenido. |
 
-**El resultado central y no-circular** que revela la auditoría: entre las personas que un modelo de gasto deprioriza, las que están en distrés medido terminan generando gasto médico *por encima de lo que el modelo predijo* — necesidad a la que fue ciego, medida en la moneda propia del modelo (no en el score de distrés, así que el hallazgo no es circular). Contraste acompañante: quitar todas las features de salud mental casi no mueve el AUC/R² global, pero hunde la captura de necesidad medida. Ambos se estiman sobre toda la población ponderada, no sobre el pequeño subgrupo severo no tratado (que se reporta solo descriptivamente). *Una estimación preliminar en el panel MEPS da un lift positivo cuyo IC 95% excluye el cero y aguanta la varianza de diseño; el resultado con el modelo completo es la Fase 2.*
+**Lo que encuentra la auditoría en MEPS** (ponderado, con IC de diseño): el modelo de gasto captura solo ~15% de la necesidad K6 del top-decil — apenas sobre el ~10% que daría un score al azar, y muy por debajo del ~41% de un oráculo (rankear por la propia necesidad); un modelo de K6 llega a ~29%. Entre las personas que el modelo de gasto deprioriza, las que están en distrés acumulan más gasto *total* futuro del que el modelo predijo (lift incremental +0.8 log-dólares con las features de salud mental, +1.0 sin ellas — ambos IC 95% excluyen el cero), así que el sesgo viene de la **etiqueta, no de falta de información**.
+
+**Límite honesto.** Ese exceso **no** aparece en la utilización no-psiquiátrica (urgencias + hospitalizaciones; lift ≈ 0, IC incluye el cero), así que **no** afirmamos que el distrés se manifieste específicamente como gasto no psiquiátrico — el exceso de gasto total puede ser en parte gasto en salud mental, y un test limpio necesita un target de gasto no-psiquiátrico (backlog). El subgrupo severo no tratado (n ≈ 40) es solo descriptivo.
 
 ## Instalación y quickstart
 

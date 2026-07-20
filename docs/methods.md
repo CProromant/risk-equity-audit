@@ -64,33 +64,48 @@ $$
 $$
 
 $\mathrm{Lift}_k > 0$ means that among the people the spend model called low-risk,
-those with measured distress went on to generate systematically more medical need
-than the model predicted — need it was blind to. Because $y_{t+1}$ is realized
-cost/utilization, the spend model's **own** currency and not K6, the result does
-not presuppose the equity premise of §1: it holds even for a reader who cares only
-about future spending. That is what defeats the circularity objection, and it
-shows the blind spot is also an efficiency loss.
+those with measured distress generated more of the outcome than the model
+predicted. It is reported three ways, and the honest reading needs all three
+(MEPS panel, design-based CIs):
 
-Reported with a design-based confidence interval (§3). The tail fraction $1-k$ and
-the distress cutoff are parameters; defaults are $k = 0.10$ and K6 $\ge 13$.
+- **Total spend, model *with* the mental-health features:** +0.77 log-dollars
+  (95% CI excludes zero). Even given K6, PHQ-2 and the treatment flag, optimizing
+  against spend deprioritizes distressed people and under-predicts their cost — so
+  the bias is driven by the **label**, not by missing information.
+- **Total spend, "blind" model *without* those features:** +1.05 (CI excludes
+  zero). Larger, as expected — blindness by construction.
+- **Avoidable utilization (ER + hospitalizations), non-psychiatric:** ≈ +0.04
+  (95% CI includes zero) — **no effect**.
+
+The third row is a genuine limitation, not a footnote. The mechanism this project
+set out to show — untreated distress surfacing as *non-psychiatric* medical need —
+is **not** demonstrated here: on total spend the lift is real but may be partly
+mental-health spending (the residual circularity §1 warns about), and on the
+non-psychiatric utilization outcome it vanishes (which may also reflect how coarse
+a binary ER/hospitalization flag is). Settling it needs a non-psychiatric *spend*
+target (total spend minus mental-health spend), which is backlog. What survives
+cleanly: the spend model captures need barely above chance (§5) and under-serves
+the distressed on its own currency of total cost.
+
+Reported with a design-based confidence interval (§3); defaults $k = 0.10$, K6 $\ge 13$.
 
 ## 3. Design-based estimation (D4)
 
 Everything reported is weighted (guardrail 3). Longitudinal quantities use
 `LONGWT`, or `LSAQWT` for SAQ-derived quantities; pooled FYC descriptives use the
-year's `PERWT*F`. Variance is by Taylor linearization over `VARSTR`/`VARPSU`.
+year's `PERWT*F`. Variance is by a **design-based (stratified cluster) bootstrap**
+over `VARSTR`/`VARPSU` — nonparametric, because the audit statistics (capture,
+lift) are nonlinear so Taylor linearization does not apply cleanly.
 
-Subpopulations — panel completers ∩ valid K6 in both years — are handled by
-**domain (subpopulation) estimation**: the full sampling frame is kept and the
-domain enters through a 0/1 indicator. We never physically filter the dataset and
-re-run the design on the subset; that understates variance and is the classic MEPS
-trap. This is the project standard for every subgroup result, including the severe
-subgroup of §6.
-
-The audit package implements design-based variance as a **stratified cluster
-bootstrap** (`SurveyDesign(strata=VARSTR, psu=VARPSU)`): each resample draws PSUs
-with replacement within strata rather than individual rows. Omitting the design
-falls back to a plain row bootstrap for non-survey data.
+The analysis runs on the filtered analytic sample (panel completers ∩ valid K6 in
+both years), and the cluster bootstrap resamples PSUs **within that domain**
+(`SurveyDesign(strata=VARSTR, psu=VARPSU)`; each resample draws PSUs with
+replacement within strata). This is valid as long as each stratum keeps ≥ 2 PSUs
+in the domain; `SurveyDesign` **warns** when a stratum collapses to one PSU, whose
+variance contribution is then zero (biasing the CI low). On the MEPS panel 3 strata
+collapse — a small share. The stricter alternative — keep the full frame and enter
+the domain through a 0/1 indicator (true domain estimation) — is cleaner and is
+backlog. Omitting the design falls back to a plain row bootstrap for non-survey data.
 
 ## 4. Model comparability (D3)
 
@@ -112,16 +127,21 @@ The exact formula for each lives in its docstring; their roles:
   priority set holds, and where high-need units sit on the score.
 - `reclassification` — who enters and leaves the priority set when the label
   switches from A to B; the population cost of the label choice.
-- `ablation` — drop the `mental_health` feature group and refit, contrasting
-  Δ global performance (expected ≈ 0) with Δ capture. Focused on T1/T2.
+- `ablation` — **cross-fit** with and without the `mental_health` group,
+  contrasting Δ global performance (measured out-of-fold, not assumed) with
+  Δ capture of an independent need measure passed as `need=`.
 - `regression_to_mean` — the share of any top-$k$ outcome drop that is a
-  statistical artifact rather than a real effect.
+  statistical artifact; descriptive only (selection is on the score, not the
+  outcome, and it is scale-dependent).
+- `top_k_capture` also returns a **floor** (= $k$, a random score) and an
+  **oracle** (ranking by need itself); a raw capture is read against both.
 
 ## 6. Two honesty constraints
 
 - **T3 is near-tautological.** K6$_t$ dominates the prediction of K6$_{t+1}$, so a
   strong T3 model and its capture are not findings — they are a sanity check that
   the machinery works, and are reported as such.
-- **The severe untreated subgroup is small** (n ≈ 45). It is described with wide
-  design-based CIs and never modeled. The reported finding is the population-level
-  incremental lift of §2, not this subgroup.
+- **The severe untreated subgroup is small** (n ≈ 40 in the K6-both-years analytic
+  sample; ~63 in the full panel). It is described with wide design-based CIs and
+  never modeled. The reported finding is the population-level incremental lift of
+  §2, not this subgroup.

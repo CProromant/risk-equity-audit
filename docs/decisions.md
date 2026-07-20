@@ -98,3 +98,22 @@ El PROTOCOL proponía Synthea. Uso un **generador sintético dentro de `demo/run
 (determinista, `seed=2026`): el auditor solo necesita scores+need+weights, así que un
 dataset inventado en el script es más robusto y rápido que una descarga externa frágil, y
 cumple el mismo propósito (ver la herramienta funcionar sin datos reales ni PHI).
+
+## 2026-07-19 — Revisión de código (REVIEW.md) y su resolución
+
+Una revisión externa encontró bugs que fabricaban o sobre-afirmaban hallazgos. Cerrados:
+
+- **Ablación in-sample (A1):** ahora cross-fitted; Δglobal se mide, no se asume ≈0.
+- **Ablación medía captura del target (A2):** parámetro `need`; audita captura de K6.
+- **Lift con un modelo que veía K6 (A3):** se reporta con y sin las features de salud mental (ciego
+  +1.05, con features +0.77 — ambos IC excluyen 0). El sesgo es de la **etiqueta**, no de falta de info.
+- **Escala y circularidad (A4):** el lift se declara en log-dólares y se reporta también sobre
+  utilización evitable (no-psiquiátrica), donde es **nulo** (≈+0.04, IC incluye 0). Conclusión honesta:
+  **no se demuestra el mecanismo no-psiquiátrico**; un target de gasto no-psiquiátrico queda en backlog.
+- **Captura sin piso/oráculo (B1):** `CaptureResult` reporta floor (=k) y oracle. Spend 15% vs floor 10%, oracle 41%.
+- **RTM mal especificado (B2):** fórmula con pendiente de regresión; degradado a descriptivo.
+- **Varianza:** el bootstrap opera sobre el dominio filtrado (A5); se avisa cuando un estrato colapsa a 1
+  PSU (3 en el panel) (B3); se quitó la promesa muerta de linearización de Taylor (D3).
+- **Determinismo (N2):** LightGBM `deterministic=True, force_row_wise=True`.
+- **Validación (C3/N1):** las funciones públicas exigen finitos y misma longitud; `run_audit` re-indexa por etiqueta.
+- **Docs (D1/D2):** estado único; n del subgrupo severo = 40 (analítico) / 63 (panel); borrado el "45" muerto.
