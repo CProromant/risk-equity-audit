@@ -6,7 +6,7 @@
 
 [![CI](https://github.com/CProromant/risk-equity-audit/actions/workflows/ci.yml/badge.svg)](https://github.com/CProromant/risk-equity-audit/actions/workflows/ci.yml)
 ![license](https://img.shields.io/badge/license-MIT-green)
-[![DOI](https://zenodo.org/badge/1304483703.svg)](https://doi.org/10.5281/zenodo.21461268)
+[![DOI](https://img.shields.io/badge/DOI-10.5281%2Fzenodo.21461268-blue)](https://doi.org/10.5281/zenodo.21461268)
 
 > **Project status.** **`v0.1.0` released** and archived on Zenodo (DOI above). The `riskaudit` auditing library is implemented and tested (7 functions, design-based CIs, ~99% coverage); the MEPS case study and a self-contained demo run end to end. Built phase by phase per [`PROTOCOL.md`](PROTOCOL.md) and [`PLAN.md`](PLAN.md).
 
