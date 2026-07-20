@@ -126,7 +126,11 @@ Built phase by phase (see [`PLAN.md`](PLAN.md) for task-level detail and accepta
 
 ## How to cite
 
-A citation with a Zenodo DOI will be added at release. For now, please cite the repository URL and the author.
+If you use `riskaudit`, please cite it. A Zenodo DOI is minted when the release is archived; until then:
+
+> Proromant, C. (2026). *riskaudit: auditing label-choice bias in healthcare risk-stratification models* (v0.1.0). https://github.com/CProromant/risk-equity-audit
+
+**To mint the DOI:** connect the repository to [Zenodo](https://zenodo.org) (Zenodo → your GitHub settings → enable this repo), then publish the `v0.1.0` release on GitHub; Zenodo archives it and issues the DOI automatically. Add the DOI here and in `CITATION.cff` afterwards.
 
 ## License
 

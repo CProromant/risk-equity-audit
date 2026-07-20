@@ -9,8 +9,8 @@ def test_seed_is_frozen():
     assert SEED == 2026
 
 
-def test_version_is_dev_prerelease():
-    assert __version__ == "0.1.0.dev0"
+def test_version():
+    assert __version__ == "0.1.0"
 
 
 @pytest.mark.parametrize("name", ["riskaudit.audit", "riskaudit.etl"])

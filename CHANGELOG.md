@@ -1,0 +1,28 @@
+# Changelog
+
+## v0.1.0 — 2026-07-19
+
+First release. The product is the **`riskaudit` auditing library**; the MEPS study
+and the synthetic demo are worked examples.
+
+### `riskaudit.audit`
+- `top_k_capture` — weighted top-k capture of need, reported against a random-score
+  floor (= k) and an oracle ceiling (ranking by need itself).
+- `reclassification` — weighted 2×2 of who enters and leaves the top-k when the label changes.
+- `label_choice_curve` — mean need across score percentiles, with a bootstrap band.
+- `ablation` — **cross-fitted** Δ global performance vs Δ capture of an independent
+  need measure, per feature group.
+- `regression_to_mean` — descriptive share of a top-k drop attributable to RTM
+  (weighted regression slope).
+- `incremental_lift` — the contribution metric: excess future outcome, in the
+  deprioritized tail, of the distressed over everyone else.
+- `audit_report` — self-contained HTML report.
+- `SurveyDesign` — stratified cluster (VARSTR/VARPSU) bootstrap CIs; warns on
+  single-PSU strata. Public inputs are validated (finite, equal length). ~99% test coverage.
+
+### Examples
+- **MEPS 2021–2023**: verified ETL, three comparable LightGBM models, full weighted
+  design-based audit. On this data the spend model captures need barely above chance
+  and under-serves the distressed on total cost; the effect does **not** appear on
+  non-psychiatric utilization, so that mechanism is not demonstrated (docs/methods.md §2).
+- **Synthetic demo** (`demo/run_demo.py`): end-to-end, no external data, no PHI.

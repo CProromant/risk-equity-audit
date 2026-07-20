@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "riskaudit"
-version = "0.1.0.dev0"
+version = "0.1.0"
 description = "Label-choice bias audit for healthcare risk-stratification models"
 readme = "README.md"
 requires-python = ">=3.11"

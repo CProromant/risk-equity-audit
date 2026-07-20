@@ -1,0 +1,19 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+title: "riskaudit: auditing label-choice bias in healthcare risk-stratification models"
+abstract: >-
+  A Python library that audits any risk-stratification model for label-choice
+  bias: how much real need it leaves behind when trained on a proxy such as
+  healthcare spending. Ships with a reproducible MEPS example and a synthetic demo.
+authors:
+  - family-names: Proromant
+    given-names: Conrado
+version: 0.1.0
+date-released: 2026-07-19
+license: MIT
+repository-code: "https://github.com/CProromant/risk-equity-audit"
+keywords:
+  - algorithmic-fairness
+  - health-equity
+  - risk-stratification
+  - label-choice-bias
