@@ -46,7 +46,8 @@ def build_features(panel: pd.DataFrame) -> FeatureMatrix:
     X = d[_DEMO + _CHRONIC + _UTIL + _SPEND + _MENTAL].copy()
     X[_CATEGORICAL] = X[_CATEGORICAL].astype("category")
 
-    avoidable = d.er_t1 + d.ip_disch_t1
+    # a missing event count means no recorded events, not missing need
+    avoidable = d.er_t1.fillna(0) + d.ip_disch_t1.fillna(0)
     targets = {
         "spend": np.log1p(d.totexp_t1),
         "avoidable_util": avoidable,

@@ -42,6 +42,7 @@ def _read(fid: str, names, raw_dir: Path) -> pd.DataFrame:
 
 
 def _clean(df: pd.DataFrame) -> pd.DataFrame:
+    df = df.copy()
     cols = [c for c in df.columns if c not in _KEEP_RAW]
     df[cols] = df[cols].mask(df[cols].isin(_MISSING))
     return df

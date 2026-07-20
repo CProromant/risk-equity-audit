@@ -20,7 +20,15 @@ _GRID = [
     {"num_leaves": 31, "n_estimators": 400, "learning_rate": 0.05},
     {"num_leaves": 31, "n_estimators": 600, "learning_rate": 0.03},
 ]
-_FIXED = {"min_child_samples": 30, "n_jobs": -1, "verbose": -1}
+# deterministic + force_row_wise make LightGBM reproducible run-to-run (guardrail:
+# determinism); without them n_jobs>1 gives slightly different trees each run.
+_FIXED = {
+    "min_child_samples": 30,
+    "n_jobs": -1,
+    "verbose": -1,
+    "deterministic": True,
+    "force_row_wise": True,
+}
 
 
 def _estimator(task: str, params: dict, seed: int):
@@ -61,13 +69,16 @@ def train_all(features: FeatureMatrix, out_dir: Path = ARTIFACTS_DIR, seed: int 
     Predictions are 5-fold cross-fitted over the whole analytic sample (folds
     stratified by spend decile), so the audit runs on every row with a model
     that did not see it. Hyperparameters are tuned lightly per target over one
-    shared grid and frozen (docs/decisions.md).
+    shared grid and frozen. The winning config is chosen on the same OOF folds it
+    is then reused for, so the ``metrics.json`` scores are mildly optimistic
+    (docs/decisions.md). Also fits a ``spend_no_mh`` model with the mental-health
+    group removed, for the label-choice contrast in the audit.
     """
     X, w = features.X, features.weights
     strata = pd.qcut(X.totexp_t.fillna(X.totexp_t.median()), 10, labels=False, duplicates="drop")
     folds = list(StratifiedKFold(5, shuffle=True, random_state=seed).split(X, strata))
 
-    preds, metrics = {}, {}
+    preds, metrics, best = {}, {}, {}
     out_dir.mkdir(parents=True, exist_ok=True)
     for target, task in _TASKS.items():
         y = features.targets[target]
@@ -75,7 +86,7 @@ def train_all(features: FeatureMatrix, out_dir: Path = ARTIFACTS_DIR, seed: int 
             (_score(y, p := _oof(X, y, task, hp, folds, seed), w, task), p, hp) for hp in _GRID
         ]
         best_score, best_pred, best_hp = max(scored, key=lambda t: t[0])
-        preds[target] = best_pred
+        preds[target], best[target] = best_pred, best_hp
         model = _estimator(task, best_hp, seed).fit(X, y)
         model.booster_.save_model(str(out_dir / f"model_{target}.txt"))
         metrics[target] = {
@@ -84,6 +95,13 @@ def train_all(features: FeatureMatrix, out_dir: Path = ARTIFACTS_DIR, seed: int 
             "params": best_hp,
             "shap_importance": _shap_importance(model, X),
         }
+
+    mh = features.feature_groups.get("mental_health", [])
+    if mh:
+        x_blind = X.drop(columns=list(mh))
+        preds["spend_no_mh"] = _oof(
+            x_blind, features.targets["spend"], "reg", best["spend"], folds, seed
+        )
 
     pd.DataFrame(preds, index=X.index).to_parquet(out_dir / "predictions.parquet")
     (out_dir / "metrics.json").write_text(json.dumps(metrics, indent=2))
