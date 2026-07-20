@@ -12,6 +12,11 @@ version: 0.1.0
 date-released: 2026-07-19
 license: MIT
 repository-code: "https://github.com/CProromant/risk-equity-audit"
+doi: 10.5281/zenodo.21461268
+identifiers:
+  - type: doi
+    value: 10.5281/zenodo.21461268
+    description: "Concept DOI (resolves to the latest version)"
 keywords:
   - algorithmic-fairness
   - health-equity

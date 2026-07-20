@@ -4,11 +4,11 @@
 
 `riskaudit` is a Python toolkit that audits *any* risk-stratification model for **label-choice bias**: the systematic error that appears when a model is trained on the wrong proxy for "need" (typically **healthcare spending**) instead of need itself. The tool is the product; a reproducible worked example on U.S. MEPS data shows it finds real bias.
 
-![status](https://img.shields.io/badge/status-in%20development%20(pre--v0.1.0)-orange)
-![python](https://img.shields.io/badge/python-%E2%89%A53.11-blue)
+[![CI](https://github.com/CProromant/risk-equity-audit/actions/workflows/ci.yml/badge.svg)](https://github.com/CProromant/risk-equity-audit/actions/workflows/ci.yml)
 ![license](https://img.shields.io/badge/license-MIT-green)
+[![DOI](https://zenodo.org/badge/1304483703.svg)](https://doi.org/10.5281/zenodo.21461268)
 
-> **Project status.** Active development toward `v0.1.0`. The **`riskaudit` audit package is implemented and tested** (7 functions, design-based CIs, ~99% coverage) the **MEPS case study is complete**, and a **self-contained demo** runs end to end; the `v0.1.0` release (CHANGELOG, tag, DOI) is what remains. See the [Roadmap](#roadmap--hoja-de-ruta). Built phase by phase per [`PROTOCOL.md`](PROTOCOL.md) and [`PLAN.md`](PLAN.md).
+> **Project status.** **`v0.1.0` released** and archived on Zenodo (DOI above). The `riskaudit` auditing library is implemented and tested (7 functions, design-based CIs, ~99% coverage); the MEPS case study and a self-contained demo run end to end. Built phase by phase per [`PROTOCOL.md`](PROTOCOL.md) and [`PLAN.md`](PLAN.md).
 
 *(Versión en español más abajo — [ir al español](#español).)*
 
@@ -122,15 +122,15 @@ Built phase by phase (see [`PLAN.md`](PLAN.md) for task-level detail and accepta
 - **Phase 1** ✅ — MEPS ETL: verified data dictionary, cleaned panel (6,741 persons).
 - **Phase 2** ✅ — Models + full weighted, design-based audit on MEPS.
 - **Phase 3** ✅ — `riskaudit.audit` API (~99% coverage) + self-contained synthetic demo.
-- **Phase 4** — Release `v0.1.0` (bilingual README, CHANGELOG, Zenodo DOI).
+- **Phase 4** ✅ — Release `v0.1.0`, archived on Zenodo ([10.5281/zenodo.21461268](https://doi.org/10.5281/zenodo.21461268)).
 
 ## How to cite
 
-If you use `riskaudit`, please cite it. A Zenodo DOI is minted when the release is archived; until then:
+If you use `riskaudit`, please cite it:
 
-> Proromant, C. (2026). *riskaudit: auditing label-choice bias in healthcare risk-stratification models* (v0.1.0). https://github.com/CProromant/risk-equity-audit
+> Proromant, C. (2026). *riskaudit: auditing label-choice bias in healthcare risk-stratification models* (v0.1.0) [Software]. Zenodo. https://doi.org/10.5281/zenodo.21461268
 
-**To mint the DOI:** connect the repository to [Zenodo](https://zenodo.org) (Zenodo → your GitHub settings → enable this repo), then publish the `v0.1.0` release on GitHub; Zenodo archives it and issues the DOI automatically. Add the DOI here and in `CITATION.cff` afterwards.
+Machine-readable metadata is in [`CITATION.cff`](CITATION.cff).
 
 ## License
 
@@ -147,7 +147,7 @@ If you use `riskaudit`, please cite it. A Zenodo DOI is minted when the release 
 
 `riskaudit` es una herramienta en Python que audita *cualquier* modelo de estratificación de riesgo en busca de **sesgo por elección de la etiqueta** (*label-choice bias*): el error sistemático que aparece cuando el modelo se entrena con un proxy equivocado de "necesidad" (típicamente el **gasto sanitario**) en lugar de la necesidad misma. La herramienta es el producto; un ejemplo reproducible sobre datos de MEPS (EE.UU.) muestra que encuentra sesgo real.
 
-> **Estado del proyecto.** En desarrollo activo hacia `v0.1.0`. El **paquete de auditoría `riskaudit` está implementado y testeado** (7 funciones, IC de diseño, ~99% de cobertura) el **estudio MEPS está completo** y un **demo auto-contenido** corre de punta a punta; falta el release `v0.1.0` (CHANGELOG, tag, DOI). Ver la [hoja de ruta](#roadmap--hoja-de-ruta). Construido por fases según [`PROTOCOL.md`](PROTOCOL.md) y [`PLAN.md`](PLAN.md).
+> **Estado del proyecto.** **`v0.1.0` publicado** y archivado en Zenodo (DOI arriba). La librería de auditoría `riskaudit` está implementada y testeada (7 funciones, IC de diseño, ~99% de cobertura); el estudio MEPS y un demo auto-contenido corren de punta a punta. Construido por fases según [`PROTOCOL.md`](PROTOCOL.md) y [`PLAN.md`](PLAN.md).
 
 ## Qué es esto
 
