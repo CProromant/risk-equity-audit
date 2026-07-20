@@ -7,6 +7,7 @@ from riskaudit._config import SEED
 from riskaudit.audit._common import (
     SurveyDesign,
     boot_ci,
+    check_inputs,
     to_float,
     weighted_capture,
     weights_or_ones,
@@ -18,6 +19,8 @@ class CaptureResult:
     value: float
     ci: tuple[float, float]
     k: float
+    baseline: float  # capture expected from a random score (= k)
+    oracle: float  # capture from ranking by need itself (the achievable ceiling)
 
 
 def top_k_capture(
@@ -62,15 +65,19 @@ def top_k_capture(
     Returns
     -------
     CaptureResult
-        ``value`` and its 95% weighted-bootstrap ``ci``.
+        ``value``, its 95% ``ci``, the random-score ``baseline`` (= ``k``), and
+        the ``oracle`` (ranking by ``need`` itself). Read ``value`` against both:
+        a raw capture is uninterpretable without its floor and ceiling.
     """
     s = to_float(scores)
     nd = to_float(need)
     w = weights_or_ones(weights, s.shape[0])
+    check_inputs(scores=s, need=nd, weights=w)
 
     def stat(idx: np.ndarray) -> float:
         return weighted_capture(s[idx], nd[idx], w[idx], k)
 
     value = stat(np.arange(s.shape[0]))
     ci = boot_ci(stat, s.shape[0], n_boot, SEED, design)
-    return CaptureResult(value, ci, k)
+    oracle = weighted_capture(nd, nd, w, k)
+    return CaptureResult(value, ci, k, k, oracle)

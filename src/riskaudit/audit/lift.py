@@ -6,6 +6,7 @@ from riskaudit._config import SEED
 from riskaudit.audit._common import (
     SurveyDesign,
     boot_ci,
+    check_inputs,
     to_float,
     topk_mask,
     weights_or_ones,
@@ -80,6 +81,7 @@ def incremental_lift(
     d = to_float(distress)
     s = to_float(scores)
     w = weights_or_ones(weights, y.shape[0])
+    check_inputs(y_t1=y, y_pred=p, distress=d, scores=s, weights=w)
     r = y - p
 
     def stat(idx) -> float:

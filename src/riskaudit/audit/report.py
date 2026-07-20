@@ -33,7 +33,8 @@ def _render(name: str, r: Any) -> str:
     if isinstance(r, CaptureResult):
         return (
             f"<p><b>{name}</b>: top-{r.k:.0%} capture = {r.value:.1%} "
-            f"(95% CI {r.ci[0]:.1%}–{r.ci[1]:.1%})</p>"
+            f"(95% CI {r.ci[0]:.1%}–{r.ci[1]:.1%}; "
+            f"floor {r.baseline:.1%}, oracle {r.oracle:.1%})</p>"
         )
     if isinstance(r, RTMResult):
         return (

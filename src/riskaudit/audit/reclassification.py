@@ -1,7 +1,7 @@
 import pandas as pd
 from numpy.typing import ArrayLike
 
-from riskaudit.audit._common import to_float, topk_mask, weights_or_ones
+from riskaudit.audit._common import check_inputs, to_float, topk_mask, weights_or_ones
 
 
 def reclassification(
@@ -42,6 +42,7 @@ def reclassification(
     a = to_float(scores_a)
     b = to_float(scores_b)
     w = weights_or_ones(weights, a.shape[0])
+    check_inputs(scores_a=a, scores_b=b, weights=w)
     ta = topk_mask(a, w, k)
     tb = topk_mask(b, w, k)
     cells = {"stay": ta & tb, "dropped": ta & ~tb, "added": ~ta & tb, "out": ~ta & ~tb}

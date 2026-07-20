@@ -7,6 +7,7 @@ from riskaudit._config import SEED
 from riskaudit.audit._common import (
     SurveyDesign,
     boot_ci,
+    check_inputs,
     to_float,
     topk_mask,
     weights_or_ones,
@@ -22,11 +23,17 @@ class RTMResult:
     ci: tuple[float, float]
 
 
-def _wcorr(x: np.ndarray, y: np.ndarray, w: np.ndarray) -> float:
+def _wcov(x: np.ndarray, y: np.ndarray, w: np.ndarray) -> float:
     mx, my = wmean(x, w), wmean(y, w)
-    cov = np.sum(w * (x - mx) * (y - my))
-    denom = np.sqrt(np.sum(w * (x - mx) ** 2) * np.sum(w * (y - my) ** 2))
-    return float(cov / denom) if denom > 0 else np.nan
+    return float(np.sum(w * (x - mx) * (y - my)) / np.sum(w))
+
+
+def _expected_drop(yt, yt1, top, w) -> float:
+    var_t = _wcov(yt, yt, w)
+    beta = _wcov(yt, yt1, w) / var_t if var_t > 0 else np.nan
+    top_t = wmean(yt[top], w[top])
+    predicted_t1 = wmean(yt1, w) + beta * (top_t - wmean(yt, w))
+    return top_t - predicted_t1
 
 
 def regression_to_mean(
@@ -41,17 +48,24 @@ def regression_to_mean(
     r"""Share of the top-``k`` outcome drop attributable to regression to the mean.
 
     For units in the top ``k`` of ``scores_t``, the observed drop is
-    :math:`\bar{y}_t - \bar{y}_{t+1}` (weighted). Under pure regression to the
-    mean the expected next-period value of an extreme group shrinks toward the
-    population mean by :math:`(1-\rho)`, giving an RTM-expected drop of
+    :math:`\bar y_{t,\text{top}} - \bar y_{t+1,\text{top}}` (weighted). The
+    RTM-expected next-period value of the top group is the population regression
+    line evaluated at the group's mean,
 
     .. math::
-        \Delta_{\text{RTM}} \;=\; (1-\rho)\,(\bar{y}_t - \mu),
+        \widehat{y}_{t+1,\text{top}} \;=\; \mu_{t+1}
+        + \beta\,(\bar y_{t,\text{top}} - \mu_t), \qquad
+        \beta = \frac{\operatorname{cov}_w(y_t, y_{t+1})}{\operatorname{var}_w(y_t)},
 
-    where :math:`\rho` is the weighted year-to-year correlation of the outcome
-    and :math:`\mu` its population mean. The reported ``rtm_share`` is
-    :math:`\Delta_{\text{RTM}} / (\bar{y}_t - \bar{y}_{t+1})` — how much of the
-    observed decline is a statistical artifact rather than a real effect.
+    so the RTM-expected drop is :math:`\bar y_{t,\text{top}} -
+    \widehat{y}_{t+1,\text{top}}` and ``rtm_share`` is its ratio to the observed
+    drop.
+
+    **Caveats.** Classic RTM assumes selection on :math:`y_t` itself; here the
+    top group is chosen by ``scores_t``, so this is an approximation. The result
+    is scale-dependent — run it in the same units the claim is made in (e.g.
+    ``log1p`` spend, not raw dollars, if the model is on the log scale). Treat it
+    as descriptive.
 
     Parameters
     ----------
@@ -66,8 +80,7 @@ def regression_to_mean(
     n_boot : int, default 1000
         Weighted bootstrap resamples for the confidence interval.
     design : SurveyDesign, optional
-        When given, the CI resamples PSUs within strata (VARSTR/VARPSU) instead
-        of rows, for a design-based interval.
+        When given, the CI resamples PSUs within strata for a design-based interval.
 
     Returns
     -------
@@ -78,21 +91,18 @@ def regression_to_mean(
     yt1 = to_float(y_t1)
     s = to_float(scores_t)
     w = weights_or_ones(weights, yt.shape[0])
-    mu = wmean(yt, w)
+    check_inputs(y_t=yt, y_t1=yt1, scores_t=s, weights=w)
 
     def stat(idx: np.ndarray) -> float:
-        m = topk_mask(s[idx], w[idx], k)
-        top_t = wmean(yt[idx][m], w[idx][m])
-        denom = top_t - wmean(yt1[idx][m], w[idx][m])
-        if abs(denom) < 1e-12:
+        top = topk_mask(s[idx], w[idx], k)
+        observed = wmean(yt[idx][top], w[idx][top]) - wmean(yt1[idx][top], w[idx][top])
+        if abs(observed) < 1e-12:
             return np.nan
-        rho = _wcorr(yt[idx], yt1[idx], w[idx])
-        return (1 - rho) * (top_t - wmean(yt[idx], w[idx])) / denom
+        return _expected_drop(yt[idx], yt1[idx], top, w[idx]) / observed
 
     top = topk_mask(s, w, k)
     observed = wmean(yt[top], w[top]) - wmean(yt1[top], w[top])
-    rho = _wcorr(yt, yt1, w)
-    expected = (1 - rho) * (wmean(yt[top], w[top]) - mu)
+    expected = _expected_drop(yt, yt1, top, w)
     share = float(expected / observed) if abs(observed) > 1e-12 else float("nan")
     ci = boot_ci(stat, yt.shape[0], n_boot, SEED, design)
     return RTMResult(float(observed), float(expected), share, ci)
