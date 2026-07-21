@@ -66,6 +66,8 @@ This is **label-choice bias** (Obermeyer et al., [2019](https://doi.org/10.1126/
 | `incremental_lift(y_t1, y_pred, distress, scores, k, weights)` | **The contribution metric:** among the deprioritized, do those in need generate *more future outcome than predicted*? Makes the argument non-circular. |
 | `regression_to_mean(y_t, y_t1, scores_t, k, weights)` | How much of a top-*k* outcome drop is just regression to the mean? (descriptive) |
 | `label_robustness(scores, need, weights, k)` | How wrong the `need` label would have to be to explain away the gap. |
+| `group_capture(scores, need, groups, k, weights)` | Capture computed within each subgroup — **whose** need does the score rank worst? |
+| `label_blend_frontier(scores_a, scores_b, need, k, weights, groups, alphas)` | Blend two candidate labels α·A+(1−α)·B and trace capture and top-*k* composition across the frontier. |
 | `audit_report(results, out_html)` | Bundles everything into a self-contained HTML report. |
 
 ## The MEPS example
@@ -181,6 +183,8 @@ Esto es el **sesgo por elección de la etiqueta** (Obermeyer et al., [2019](http
 | `incremental_lift` | **La métrica-contribución:** entre los deprioritizados, ¿los que tienen necesidad generan *más desenlace futuro del predicho*? Hace no-circular el argumento. |
 | `regression_to_mean` | ¿Cuánto de una caída del top-*k* es solo regresión a la media? (descriptivo) |
 | `label_robustness` | ¿Cuán equivocada tendría que estar la etiqueta `need` para explicar la brecha? |
+| `group_capture` | Captura dentro de cada subgrupo — ¿de *quién* es la necesidad peor rankeada? |
+| `label_blend_frontier` | Mezcla dos etiquetas α·A+(1−α)·B y traza captura y composición del top-*k* a lo largo de la frontera. |
 | `audit_report` | Empaqueta todo en un informe HTML autocontenido. |
 
 ## El ejemplo MEPS

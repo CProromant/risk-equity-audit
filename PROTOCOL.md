@@ -6,7 +6,7 @@
 - Autor del proyecto: Conrado — MD (PUC), MSc(c) Data Science (PUC)
 - Cómo usar este documento: guardarlo como `PROTOCOL.md` en la raíz de una carpeta vacía, crear un `CLAUDE.md` mínimo que diga "Lee y sigue PROTOCOL.md; ejecuta por fases; no avances de fase sin cumplir los criterios de aceptación", y arrancar Claude Code ahí con el prompt de la sección 8. Docs oficiales de Claude Code: https://docs.claude.com/en/docs/claude-code/overview
 
-> **Estado (vivo · act. 21-jul-2026).** `v0.1.2` **publicado** (PyPI + Zenodo DOI). **El producto es la librería `riskaudit`** (8 funciones públicas); MEPS y el demo son *ejemplos*. Las secciones **§0–§8 son el registro del build v0.1**, ya ejecutado y entregado — se conservan como historia, no como pendientes. El **spec vivo de v0.2 es la §9** (abajo); su ejecución paso a paso vive en `PLAN.md`. Las decisiones fijas (§1 y §9) no se re-discuten.
+> **Estado (vivo · act. 21-jul-2026).** `v0.1.2` **publicado** (PyPI + Zenodo DOI). **El producto es la librería `riskaudit`** (10 funciones públicas; 8 en el último release v0.1.2); MEPS y el demo son *ejemplos*. Las secciones **§0–§8 son el registro del build v0.1**, ya ejecutado y entregado — se conservan como historia, no como pendientes. El **spec vivo de v0.2 es la §9** (abajo); su ejecución paso a paso vive en `PLAN.md`. Las decisiones fijas (§1 y §9) no se re-discuten.
 
 ---
 
@@ -243,7 +243,7 @@ Después, autorizar fase por fase. Para la Fase 1, recordarle el guardrail 1 (ve
 
 `v0.1.2` está publicado; el build v0.1 (§0–§8) está entregado. Esta sección extiende el spec hacia v0.2 sin re-discutir lo anterior.
 
-**Producto y API.** El producto es la librería `riskaudit`. API pública actual (**8 funciones**): `top_k_capture`, `reclassification`, `label_choice_curve`, `ablation`, `regression_to_mean`, `incremental_lift`, `label_robustness`, `audit_report` — más `SurveyDesign` y los dataclasses de resultado. MEPS y el demo son ejemplos, no el producto.
+**Producto y API.** El producto es la librería `riskaudit`. API pública actual (**10 funciones**): `top_k_capture`, `reclassification`, `label_choice_curve`, `ablation`, `regression_to_mean`, `incremental_lift`, `label_robustness`, `group_capture`, `label_blend_frontier`, `audit_report` — más `SurveyDesign` y los dataclasses de resultado. (Las 8 primeras salieron en v0.1.2; `group_capture` y `label_blend_frontier` son la Fase B, aún sin release.) MEPS y el demo son ejemplos, no el producto.
 
 **Decisiones fijas nuevas (no re-discutir):**
 

@@ -38,8 +38,8 @@ infraestructura: pesos, bootstrap de filas/diseño (VARSTR/VARPSU), validación 
 
 | Función | Qué responde |
 |---|---|
-| `group_capture(scores, need, k, weights, groups)` | Captura desagregada por subgrupo con IC de diseño — la pregunta de equidad directa. Wrapper del bootstrap ya construido. |
-| `label_blend_frontier(scores_by_label, need, k, weights, alphas)` | Barre etiquetas compuestas α·A+(1−α)·B y muestra, por α, captura y composición del top-k: la frontera de trade-off completa. Es el remedio de Obermeyer (reetiquetar), ejecutable. La más citable. |
+| `group_capture(scores, need, groups, k, weights)` **✓ entregada** | Captura desagregada por subgrupo con IC de dominio — la pregunta de equidad directa. Reusa el bootstrap ya construido. |
+| `label_blend_frontier(scores_a, scores_b, need, k, weights, groups, alphas)` **✓ entregada** | Barre etiquetas compuestas α·A+(1−α)·B y muestra, por α, captura y composición del top-k: la frontera de trade-off completa. Es el remedio de Obermeyer (reetiquetar), ejecutable. La más citable. |
 | **`label_robustness(scores, need, weights, noise_grid)`** *(idea Fable)* | ¿Cuánto error en la **propia `need`** tumbaría la conclusión? Inyecta ruido/sesgo acotado en `need` y reporta la perturbación mínima que da vuelta la brecha de captura — un bound estilo Rosenbaum, no un IC de muestreo. Ataca el punto donde un revisor pega de verdad ("¿cómo sabes que tu etiqueta de necesidad es correcta?"). Nadie lo empaqueta; nuestra propia experiencia MEPS (K6 es un proxy, el efecto se cae en utilización no-psiquiátrica) lo justifica. **Entregado en v0.1.2** (firma final: `grid` en vez de `noise_grid`). |
 
 ### Tanda 2 (v0.2+; algunas se benefician del panel MEPS modelado)
