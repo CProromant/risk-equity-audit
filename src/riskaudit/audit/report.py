@@ -13,6 +13,7 @@ from riskaudit.audit.ablation import AblationResult  # noqa: E402
 from riskaudit.audit.capture import CaptureResult  # noqa: E402
 from riskaudit.audit.curves import CurveResult  # noqa: E402
 from riskaudit.audit.lift import LiftResult  # noqa: E402
+from riskaudit.audit.robustness import RobustnessResult  # noqa: E402
 from riskaudit.audit.rtm import RTMResult  # noqa: E402
 
 _STYLE = (
@@ -60,6 +61,12 @@ def _render(name: str, r: Any) -> str:
         return (
             f"<h3>{name}</h3><h4>global Δ</h4>{r.global_delta.to_html()}"
             f"<h4>capture Δ</h4>{r.capture_delta.to_html()}"
+        )
+    if isinstance(r, RobustnessResult):
+        bd = "beyond the grid" if r.breakdown != r.breakdown else f"ε = {r.breakdown:.2f}"
+        return (
+            f"<p><b>{name}</b>: half-gap breakdown at {bd} — need must move that far "
+            f"toward the model's own ranking to halve the apparent bias</p>"
         )
     if isinstance(r, pd.DataFrame):
         return f"<h3>{name}</h3>{r.to_html()}"
