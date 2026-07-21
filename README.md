@@ -53,6 +53,17 @@ print(f"top-decile capture: {c.value:.0%}  (floor {c.baseline:.0%}, oracle {c.or
 
 Health systems have limited budgets, so a model decides **who gets prioritized** — usually by predicting who will "spend the most," because spending is recorded for everyone. That choice has a blind spot: someone in distress who **does not seek care** has near-zero spending, so a spend-trained model calls them low-risk and never looks. The need was there; the *label* never looked for it. This is **label-choice bias** (Obermeyer et al., 2019).
 
+```mermaid
+flowchart TD
+    N["People with real need"] --> Q{"Seek care?"}
+    Q -->|yes| V["Spending recorded — visible to the model"]
+    Q -->|no| H["Near-zero spending — invisible"]
+    V --> HI["ranked high-risk"]
+    H --> LO["ranked low-risk — the need was missed"]
+    LO --> B["Label-choice bias: need the model leaves behind"]
+    B --> R["riskaudit measures the gap: capture vs. floor and oracle"]
+```
+
 For a score $s$, an independent need measure $n$, and survey weights $w$, the top-$k$ **capture** is the weighted share of all need that lands in the highest-scoring group holding a fraction $k$ of the population:
 
 $$C_k(s)=\frac{\sum_{i\in T_k(s)} w_i\,n_i}{\sum_i w_i\,n_i},\qquad T_k(s)=\text{the top fraction } k \text{ by } s.$$
@@ -67,6 +78,17 @@ The **label-choice cost** of training on a proxy $\hat s$ instead of need is the
 ## The toolkit
 
 Every function answers one part of a single question — *how much* need is left behind, *of whom*, *compared to what*, and *with what certainty*. All support weights and carry a confidence interval (or a docstring saying why not).
+
+```mermaid
+flowchart LR
+    S["scores<br/>a deployed model's output"] --> AUD(["riskaudit.audit"])
+    N["need<br/>independent measure"] --> AUD
+    W["weights"] --> AUD
+    AUD --> C["how much? capture vs. floor and oracle"]
+    AUD --> G["of whom? group_capture"]
+    AUD --> L["which label? reclassification and frontier"]
+    AUD --> U["how certain? design-based CI and label_robustness"]
+```
 
 | | Function | Question it answers |
 |---|---|---|
@@ -197,6 +219,17 @@ print(f"captura top-decil: {c.value:.0%}  (piso {c.baseline:.0%}, oráculo {c.or
 
 Los sistemas de salud tienen presupuesto limitado, así que un modelo decide **a quién se prioriza** — normalmente prediciendo quién "va a gastar más", porque el gasto está registrado para todos. Esa elección tiene un punto ciego: alguien con distrés que **no consulta** tiene gasto casi cero, así que el modelo lo etiqueta como bajo riesgo y nunca lo mira. La necesidad estaba; la *etiqueta* nunca la buscó. Esto es el **sesgo por elección de la etiqueta** (Obermeyer et al., 2019).
 
+```mermaid
+flowchart TD
+    N["Personas con necesidad real"] --> Q{"¿Consultan?"}
+    Q -->|sí| V["Gasto registrado — visible al modelo"]
+    Q -->|no| H["Gasto casi cero — invisible"]
+    V --> HI["rankeadas de alto riesgo"]
+    H --> LO["rankeadas de bajo riesgo — la necesidad se perdió"]
+    LO --> B["Sesgo por elección de etiqueta: necesidad que el modelo deja atrás"]
+    B --> R["riskaudit mide la brecha: captura vs. piso y oráculo"]
+```
+
 Para un score $s$, una medida independiente de necesidad $n$ y pesos $w$, la **captura** top-$k$ es la fracción ponderada de toda la necesidad que cae en el grupo de mayor score que concentra una fracción $k$ de la población:
 
 $$C_k(s)=\frac{\sum_{i\in T_k(s)} w_i\,n_i}{\sum_i w_i\,n_i},\qquad T_k(s)=\text{el top } k \text{ por } s.$$
@@ -206,6 +239,17 @@ Un número de captura no significa nada solo, así que se lee contra dos anclas:
 ## La herramienta
 
 Cada función responde una parte de una sola pregunta — *cuánta* necesidad queda fuera, *de quién*, *comparada con qué* y *con qué certeza*. Todas soportan pesos y traen IC (o un docstring que dice por qué no).
+
+```mermaid
+flowchart LR
+    S["scores<br/>salida de un modelo desplegado"] --> AUD(["riskaudit.audit"])
+    N["need<br/>medida independiente"] --> AUD
+    W["weights"] --> AUD
+    AUD --> C["¿cuánta? captura vs. piso y oráculo"]
+    AUD --> G["¿de quién? group_capture"]
+    AUD --> L["¿qué etiqueta? reclassification y frontier"]
+    AUD --> U["¿qué certeza? IC de diseño y label_robustness"]
+```
 
 | | Función | Pregunta que responde |
 |---|---|---|
