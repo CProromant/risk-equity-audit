@@ -165,11 +165,11 @@ No data is stored in this repository — only download scripts and SHA-256 check
 
 ## Roadmap
 
-`v0.2.0` is on PyPI and archived on Zenodo: it reproduces the Obermeyer audit and adds subgroup capture and the label-blend frontier. Next (see [`docs/roadmap-v2.md`](docs/roadmap-v2.md)): a coverage simulation study for the capture CI, `cost_of_blindness` (the lift in budget terms), worst-off capture, and priority-list stability. A closed list, one function at a time — the project is strong because it does one thing.
+`v0.3.0` is on PyPI and archived on Zenodo. Next (see [`docs/roadmap-v2.md`](docs/roadmap-v2.md)): a coverage simulation study for the capture CI, `cost_of_blindness` (the lift in budget terms), worst-off capture, and priority-list stability. A closed list, one function at a time — the project is strong because it does one thing.
 
 ## How to cite
 
-> Proromant, C. (2026). *riskaudit: auditing label-choice bias in healthcare risk-stratification models* (v0.2.0) [Software]. Zenodo. https://doi.org/10.5281/zenodo.21461268
+> Proromant, C. (2026). *riskaudit: auditing label-choice bias in healthcare risk-stratification models* (v0.3.0) [Software]. Zenodo. https://doi.org/10.5281/zenodo.21461268
 
 Machine-readable metadata is in [`CITATION.cff`](CITATION.cff).
 
@@ -336,11 +336,11 @@ No se versiona ningún dato — solo scripts de descarga y checksums SHA-256; lo
 
 ## Roadmap
 
-`v0.2.0` está en PyPI y archivado en Zenodo: reproduce la auditoría de Obermeyer y agrega captura por subgrupo y la frontera de reetiquetado. Siguiente (ver [`docs/roadmap-v2.md`](docs/roadmap-v2.md)): un estudio de cobertura por simulación para el IC de captura, `cost_of_blindness` (el lift en términos de presupuesto), captura del peor-servido y estabilidad de la lista. Lista cerrada, una función a la vez.
+`v0.3.0` está en PyPI y archivado en Zenodo. Siguiente (ver [`docs/roadmap-v2.md`](docs/roadmap-v2.md)): un estudio de cobertura por simulación para el IC de captura, `cost_of_blindness` (el lift en términos de presupuesto), captura del peor-servido y estabilidad de la lista. Lista cerrada, una función a la vez.
 
 ## Cómo citar
 
-> Proromant, C. (2026). *riskaudit: auditing label-choice bias in healthcare risk-stratification models* (v0.2.0) [Software]. Zenodo. https://doi.org/10.5281/zenodo.21461268
+> Proromant, C. (2026). *riskaudit: auditing label-choice bias in healthcare risk-stratification models* (v0.3.0) [Software]. Zenodo. https://doi.org/10.5281/zenodo.21461268
 
 Metadatos legibles por máquina en [`CITATION.cff`](CITATION.cff).
 

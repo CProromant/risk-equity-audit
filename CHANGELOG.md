@@ -1,5 +1,18 @@
 # Changelog
 
+## v0.3.0 — 2026-07-21
+
+- **Restructure:** the installed library ships only `riskaudit.audit` now. The MEPS pipeline
+  (ETL, models, scripts) moved to `examples/meps`, and the demo became a controlled
+  `examples/benchmark` that plants a known bias and exercises every function. The optional
+  extra `[meps]` is renamed `[examples]`. The public API — always `riskaudit.audit` — is
+  unchanged; only the never-public helper submodules moved.
+- **Docs:** an academic-grade README (formal estimand, an Inference section with its honest
+  coverage caveats, explicit Assumptions, a tiered Evidence table, a References bibliography)
+  with conceptual diagrams; the MEPS case-study methods move to `examples/meps/METHODS.md`.
+- Housekeeping: example tests colocated with their examples; dead leftovers removed; the MEPS
+  example is now self-contained under `examples/meps`.
+
 ## v0.2.0 — 2026-07-21
 
 - New: `group_capture` — top-k need capture disaggregated by subgroup, with a domain
