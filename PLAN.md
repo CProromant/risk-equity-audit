@@ -7,6 +7,8 @@
 > **Prioridad ante conflictos (del protocolo):** correcto > reproducible > usable por terceros > bonito.
 >
 > **Seed global:** `2026`. **Python:** ≥ 3.11.
+>
+> **Estado (vivo · act. 21-jul-2026).** `v0.1.2` publicado. Las **Fases 0–4 (v0.1) están completas** — son el registro de abajo (secciones FASE 0…5 y el checklist maestro §5). El **plan vivo es la sección `v0.2` al final** de este documento. El spec vinculante de v0.2 está en `PROTOCOL.md §9`; el detalle conceptual en `docs/roadmap-v2.md`.
 
 ---
 
@@ -302,8 +304,58 @@ Para cada función: firma estable, docstring con **definición matemática exact
 - [x] F2: `make models && make audit` reproducible · informe HTML con las 7 piezas · todo ponderado · severo solo descriptivo (captura K6 spend 15% vs K6 29%; lift +0.77, IC excluye 0)
 - [x] F3: **`audit/` implementado** (7 funciones, cobertura 99%) · demo auto-contenido ✅ · ejemplo de API en README ✅
 - [x] F4: README bilingüe · CHANGELOG · `CITATION.cff` · tag `v0.1.0` · Zenodo DOI 10.5281/zenodo.21461268 · (backlog→issues opcional, pendiente)
-- [x] Transversal: métrica `incremental_lift` (contribución propia, `methods.md` §2) ✅ · **bootstrap de diseño VARSTR/VARPSU** ✅ (`SurveyDesign`; en el lift real el efecto de diseño ≈1, el hallazgo aguanta). Pendiente: cablearlos en el pipeline MEPS de la Fase 2.
+- [x] Transversal: métrica `incremental_lift` (contribución propia, `methods.md` §2) ✅ · **bootstrap de diseño VARSTR/VARPSU** ✅ (`SurveyDesign`). **(v0.1 completada y publicada.)**
 
 ---
 
-*Fin del plan. Cambios a este documento se registran también en `docs/decisions.md`.*
+# v0.2 — Equidad + validación (plan vivo)
+
+> `v0.1.2` publicado. Este es el plan ejecutable de v0.2. Spec vinculante en `PROTOCOL.md §9`; detalle conceptual en `docs/roadmap-v2.md`. Misma disciplina: fase por fase, DoD objetivo, lista cerrada.
+
+## v0.2 · Fase 0 — Pulcritud (bookkeeping) · antes que nada
+
+Cerrar la deuda de consistencia detectada en la revisión. Barato y desbloquea lo demás.
+
+- [ ] **Versión de fuente única.** Versión dinámica de hatchling (`[tool.hatch.version] path = "src/riskaudit/__init__.py"`, `dynamic = ["version"]`), para que pyproject / `__init__` / test / CITATION no vuelvan a desfasarse. **DoD:** `riskaudit.__version__` == la versión del build; el test lo verifica.
+- [ ] **`CITATION.cff` al día** (hoy dice `0.1.0`; el paquete es 0.1.2). **DoD:** versión de CITATION == versión del paquete.
+- [ ] **`py.typed`** en `src/riskaudit/`. **DoD:** el marcador se empaqueta en el wheel.
+- [ ] **Cerrar hueco de cobertura:** test que renderiza un `RobustnessResult` vía `audit_report`. **DoD:** cobertura de `riskaudit.audit` vuelve a ~99%.
+- [ ] **Docs consistentes:** marcar `label_robustness` como entregado en `docs/roadmap-v2.md`; confirmar que ningún doc lo lista como pendiente. **DoD:** grep limpio.
+- [ ] **Checklist de release** en uso (ver `PROTOCOL.md §9`): `ruff check . && ruff format --check . && pytest --cov=riskaudit.audit --cov-fail-under=90` antes de cada tag. **DoD:** se corre antes de taggear.
+
+## v0.2 · Fase A — Validación canónica (Obermeyer 2019) · el ancla
+
+Reproducir las métricas de auditoría del caso canónico sobre su sintético público (`gitlab.com/labsysmed/dissecting-bias`), usando **solo el API**. Convierte "confía en el autor" en "verificable". Detalle en `roadmap-v2.md §A`.
+
+- [ ] `validation/obermeyer_2019/download.py` (checksum SHA-256, git-ignored) + `COVERAGE.md` (resultado por resultado: reproducible / parcial / no).
+- [ ] `obermeyer_2019.ipynb`: solo API público; tabla paper vs. reproducido vs. delta; 2 figuras con `label_choice_curve` / `reclassification`.
+- [ ] Test protegido (`make validate-obermeyer`, activable con `RISKAUDIT_RUN_VALIDATION=1`).
+- [ ] Sección "Validation" bilingüe en README (≤10 líneas por idioma).
+- **AC:** un tercero corre un comando y ve la tabla de reproducción en <15 min, sin credenciales.
+- **Regla dura:** si un resultado no reproduce dentro de tolerancia, se documenta la discrepancia con hipótesis de causa — **no** se ajusta la tolerancia.
+
+## v0.2 · Fase B — Expansión del API (equidad + decisión)
+
+Una función por sesión: investigar → firma + AC → implementar contra el API → tests ~99% → fila en la tabla del README (EN/ES) → integrar en `audit_report`. Toda función reporta IC (filas y diseño) o declara en el docstring por qué no aplica.
+
+- [ ] **`group_capture(scores, need, k, weights, groups)`** — captura por subgrupo con IC de diseño: el eje de equidad ("¿de *quién* es la necesidad omitida?"). **DoD:** test con dominio de subgrupo conocido.
+- [ ] **`label_blend_frontier(scores_by_label, need, k, weights, alphas)`** — barre etiquetas compuestas α·A+(1−α)·B; la frontera de trade-off completa. La más citable. **DoD:** test con α=0 y α=1 recuperando los extremos.
+- [ ] (backlog v0.2+) `worst_off_capture`, `capture_sweep`, `cost_of_blindness`, `topk_stability`, `need_weighted_nri`, `audit_manifest`.
+- *(Ya hechas: `label_robustness` en 0.1.2; `oracle_capture` vive como `baseline`/`oracle` en `CaptureResult`.)*
+
+## v0.2 · Release v0.2.0
+
+- [ ] Bump versión (fuente única) → `0.2.0`; `CHANGELOG.md`; tabla de funciones del README al día.
+- [ ] `git tag v0.2.0` → `publish.yml` publica solo.
+- **DoD:** `pip install --upgrade riskaudit` == 0.2.0; PyPI muestra el README al día; CI verde.
+
+## Checklist maestro v0.2 (una vista)
+
+- [ ] Fase 0: versión única · `CITATION` al día · `py.typed` · cobertura ~99% · docs consistentes · checklist de release
+- [ ] Fase A: validación Obermeyer reproducible en <15 min
+- [ ] Fase B: `group_capture` · `label_blend_frontier`
+- [ ] Release v0.2.0 publicado · CI verde
+
+---
+
+*Fin del plan (v0.1 completada + v0.2 vivo). Cambios se registran también en `docs/decisions.md`.*

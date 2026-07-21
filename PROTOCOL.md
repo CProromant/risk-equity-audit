@@ -6,6 +6,8 @@
 - Autor del proyecto: Conrado — MD (PUC), MSc(c) Data Science (PUC)
 - Cómo usar este documento: guardarlo como `PROTOCOL.md` en la raíz de una carpeta vacía, crear un `CLAUDE.md` mínimo que diga "Lee y sigue PROTOCOL.md; ejecuta por fases; no avances de fase sin cumplir los criterios de aceptación", y arrancar Claude Code ahí con el prompt de la sección 8. Docs oficiales de Claude Code: https://docs.claude.com/en/docs/claude-code/overview
 
+> **Estado (vivo · act. 21-jul-2026).** `v0.1.2` **publicado** (PyPI + Zenodo DOI). **El producto es la librería `riskaudit`** (8 funciones públicas); MEPS y el demo son *ejemplos*. Las secciones **§0–§8 son el registro del build v0.1**, ya ejecutado y entregado — se conservan como historia, no como pendientes. El **spec vivo de v0.2 es la §9** (abajo); su ejecución paso a paso vive en `PLAN.md`. Las decisiones fijas (§1 y §9) no se re-discuten.
+
 ---
 
 ## 0. Qué es esto y por qué existe
@@ -234,3 +236,28 @@ Pooling de paneles 24–27; two-part models / GLM gamma para gasto; integración
 > Lee PROTOCOL.md completo. Es la especificación del proyecto y sus decisiones son vinculantes. Ejecuta la Fase 0 (andamiaje) exactamente como la define la sección 5, respetando la estructura de la sección 2 y las decisiones de la sección 1. Cuando los criterios de aceptación de la Fase 0 estén verdes, muéstrame el resumen de cierre de fase (guardrail 8) y detente para que revise antes de autorizar la Fase 1.
 
 Después, autorizar fase por fase. Para la Fase 1, recordarle el guardrail 1 (verificación de variables contra codebook) en el prompt de arranque.
+
+---
+
+## 9. v0.2 — alcance vinculante (vivo)
+
+`v0.1.2` está publicado; el build v0.1 (§0–§8) está entregado. Esta sección extiende el spec hacia v0.2 sin re-discutir lo anterior.
+
+**Producto y API.** El producto es la librería `riskaudit`. API pública actual (**8 funciones**): `top_k_capture`, `reclassification`, `label_choice_curve`, `ablation`, `regression_to_mean`, `incremental_lift`, `label_robustness`, `audit_report` — más `SurveyDesign` y los dataclasses de resultado. MEPS y el demo son ejemplos, no el producto.
+
+**Decisiones fijas nuevas (no re-discutir):**
+
+| Tema | Decisión |
+|---|---|
+| Versión | **Fuente única** — hatchling dynamic desde `src/riskaudit/__init__.py`; nunca duplicar la versión a mano (pyproject/CITATION/test la leen o la verifican). |
+| Release | **Checklist obligatorio antes de cada tag:** `ruff check . && ruff format --check . && pytest --cov=riskaudit.audit --cov-fail-under=90`. El tag `v*` dispara `publish.yml` (PyPI). |
+| API | **Lista cerrada** — ninguna función nueva fuera de la planificada (`docs/roadmap-v2.md`) sin al menos un usuario externo que la pida. El riesgo dominante es la dispersión de un autor solo. |
+| Tipos | `py.typed` en el paquete, para exponer los type hints a quien instale. |
+
+**Alcance v0.2** (detalle conceptual en `docs/roadmap-v2.md`, ejecución en `PLAN.md`):
+
+1. **Fase 0 — pulcritud/bookkeeping** (antes que nada): versión de fuente única, `CITATION.cff` al día, `py.typed`, cerrar el hueco de cobertura de `RobustnessResult`, docs consistentes.
+2. **Fase A — validación Obermeyer 2019** sobre su sintético público, usando solo el API: el ancla de credibilidad ("verificable", no "confía en el autor"). **Regla dura:** una discrepancia se documenta con hipótesis de causa; no se ajusta la tolerancia.
+3. **Fase B — expansión:** `group_capture` (equidad por subgrupo) y `label_blend_frontier` (frontera de reetiquetado α·A+(1−α)·B). `label_robustness` ya se entregó en 0.1.2; `oracle_capture` ya vive como `baseline`/`oracle` en `CaptureResult`.
+
+**Guardrails que siguen vigentes:** pesos y varianza de diseño siempre (guardrail 3); honestidad sobre límites (el nulo no-psiquiátrico se reporta, no se esconde); nombres MEPS verificados contra codebook (guardrail 1); nada de datos en git (guardrail 5); cobertura de `riskaudit.audit` ≥ 90%.
