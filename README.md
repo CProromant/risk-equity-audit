@@ -108,7 +108,7 @@ Honesty about limits is a feature of this project, not a footnote:
 
 ## Roadmap
 
-`v0.1.x` released (on PyPI, archived on Zenodo). Next (see [`docs/roadmap-v2.md`](docs/roadmap-v2.md)): validation against Obermeyer et al. 2019 on their public synthetic data, and API expansion — subgroup capture, the label-blend decision frontier, cost-of-blindness, and stability of the priority list. Closed list, one function at a time.
+`v0.2.0` released (on PyPI, archived on Zenodo). It reproduces the Obermeyer et al. (2019) audit on public data (see [`validation/`](validation/obermeyer_2019/COVERAGE.md)) and adds subgroup capture and the label-blend decision frontier. Next (see [`docs/roadmap-v2.md`](docs/roadmap-v2.md)): cost-of-blindness, worst-off capture, and stability of the priority list. Closed list, one function at a time.
 
 ## How to cite
 

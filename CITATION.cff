@@ -8,7 +8,7 @@ abstract: >-
 authors:
   - family-names: Proromant
     given-names: Conrado
-version: 0.1.2
+version: 0.2.0
 date-released: 2026-07-21
 license: MIT
 repository-code: "https://github.com/CProromant/risk-equity-audit"

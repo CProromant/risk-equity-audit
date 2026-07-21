@@ -1,5 +1,18 @@
 # Changelog
 
+## v0.2.0 — 2026-07-21
+
+- New: `group_capture` — top-k need capture disaggregated by subgroup, with a domain
+  (subpopulation) bootstrap CI: the equity axis, *whose* need the score ranks worst.
+- New: `label_blend_frontier` — capture and top-k composition as two candidate labels are
+  blended (α·A + (1−α)·B); Obermeyer's relabel-the-target remedy made executable.
+- Validation: `make validate-obermeyer` reproduces the Obermeyer et al. (2019) label-choice
+  audit on the authors' public synthetic data using only the public API. Directions
+  reproduce; the attenuated magnitudes on synthetic data are documented, not tuned away
+  (`validation/obermeyer_2019/COVERAGE.md`).
+- Build: the version is single-sourced from `riskaudit.__init__` (hatchling dynamic), and the
+  package ships `py.typed`.
+
 ## v0.1.2 — 2026-07-21
 
 - New: `label_robustness` — how wrong the `need` label would have to be (worst-case, toward
