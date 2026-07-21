@@ -260,4 +260,6 @@ Después, autorizar fase por fase. Para la Fase 1, recordarle el guardrail 1 (ve
 2. **Fase A — validación Obermeyer 2019** sobre su sintético público, usando solo el API: el ancla de credibilidad ("verificable", no "confía en el autor"). **Regla dura:** una discrepancia se documenta con hipótesis de causa; no se ajusta la tolerancia.
 3. **Fase B — expansión:** `group_capture` (equidad por subgrupo) y `label_blend_frontier` (frontera de reetiquetado α·A+(1−α)·B). `label_robustness` ya se entregó en 0.1.2; `oracle_capture` ya vive como `baseline`/`oracle` en `CaptureResult`.
 
+Del **backlog §7** (fairlearn, CLI, mkdocs, preprint) nada entra en v0.2: sigue diferido. v0.2 es solo validación + equidad.
+
 **Guardrails que siguen vigentes:** pesos y varianza de diseño siempre (guardrail 3); honestidad sobre límites (el nulo no-psiquiátrico se reporta, no se esconde); nombres MEPS verificados contra codebook (guardrail 1); nada de datos en git (guardrail 5); cobertura de `riskaudit.audit` ≥ 90%.

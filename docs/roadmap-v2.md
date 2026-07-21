@@ -1,6 +1,6 @@
 # Roadmap v2 — de librería publicada a implementación de referencia
 
-Estado base (2026-07): `riskaudit` v0.1.1 en PyPI, archivado en Zenodo (DOI
+Estado base (2026-07): `riskaudit` v0.1.2 en PyPI, archivado en Zenodo (DOI
 10.5281/zenodo.21461268), CI verde, ~99% cobertura. Ejemplos MEPS y demo sintético
 completos. El **producto es la librería**; los ejemplos solo demuestran que corre.
 
@@ -40,7 +40,7 @@ infraestructura: pesos, bootstrap de filas/diseño (VARSTR/VARPSU), validación 
 |---|---|
 | `group_capture(scores, need, k, weights, groups)` | Captura desagregada por subgrupo con IC de diseño — la pregunta de equidad directa. Wrapper del bootstrap ya construido. |
 | `label_blend_frontier(scores_by_label, need, k, weights, alphas)` | Barre etiquetas compuestas α·A+(1−α)·B y muestra, por α, captura y composición del top-k: la frontera de trade-off completa. Es el remedio de Obermeyer (reetiquetar), ejecutable. La más citable. |
-| **`label_robustness(scores, need, weights, noise_grid)`** *(idea Fable)* | ¿Cuánto error en la **propia `need`** tumbaría la conclusión? Inyecta ruido/sesgo acotado en `need` y reporta la perturbación mínima que da vuelta la brecha de captura — un bound estilo Rosenbaum, no un IC de muestreo. Ataca el punto donde un revisor pega de verdad ("¿cómo sabes que tu etiqueta de necesidad es correcta?"). Nadie lo empaqueta; nuestra propia experiencia MEPS (K6 es un proxy, el efecto se cae en utilización no-psiquiátrica) lo justifica. **Prioridad de la tanda.** |
+| **`label_robustness(scores, need, weights, noise_grid)`** *(idea Fable)* | ¿Cuánto error en la **propia `need`** tumbaría la conclusión? Inyecta ruido/sesgo acotado en `need` y reporta la perturbación mínima que da vuelta la brecha de captura — un bound estilo Rosenbaum, no un IC de muestreo. Ataca el punto donde un revisor pega de verdad ("¿cómo sabes que tu etiqueta de necesidad es correcta?"). Nadie lo empaqueta; nuestra propia experiencia MEPS (K6 es un proxy, el efecto se cae en utilización no-psiquiátrica) lo justifica. **Entregado en v0.1.2** (firma final: `grid` en vez de `noise_grid`). |
 
 ### Tanda 2 (v0.2+; algunas se benefician del panel MEPS modelado)
 
@@ -77,7 +77,7 @@ desde ya; ejecución tras A.
 
 ```
 A (Obermeyer) ─────────────┐   [iniciar ya: independiente]
-                           ├─> B tanda 1 (group_capture · label_blend_frontier · label_robustness)
+                           ├─> B tanda 1 (group_capture · label_blend_frontier · label_robustness✓)
 cerrar modelado MEPS ──────┤
                            └─> B tanda 2 (worst_off_capture · capture_sweep · cost_of_blindness · …)
 C: contactos desde ya; ejecución tras A ─> piloto (si hay puerta)

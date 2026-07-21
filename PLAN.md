@@ -185,7 +185,7 @@ F0 Andamiaje ─┬─> F1 ETL MEPS ──> F2 Modelos+Auditoría ─┐
 - [ ] Ver Fase 3, tareas 3.1–3.6. En F2 se **consumen** estas funciones; conviene tenerlas ya testeadas.
 
 ### 2.4 Auditoría end-to-end sobre MEPS
-- [ ] Correr las 6 funciones sobre los scores de los 3 modelos con **pesos siempre** (guardrail 3) y IC por bootstrap ponderado.
+- [ ] Correr las 7 funciones sobre los scores de los 3 modelos con **pesos siempre** (guardrail 3) y IC por bootstrap ponderado.
 - [ ] **Ablación** enfocada en T1/T2 (gasto/utilización): mostrar Δ desempeño global ≈ 0 vs Δ captura del grupo con distrés (evitar leer T3 como "hallazgo": es semi-tautológico porque K6_t predice K6_t1 — documentarlo).
 - [ ] **Necesidad** operacionalizada según **D5** (continuo + umbral).
 - [ ] **Subgrupo severo** (n≈45–95): solo descriptivo, IC anchos, lenguaje prudente (guardrail 4). No modelar.
@@ -234,7 +234,7 @@ Para cada función: firma estable, docstring con **definición matemática exact
 - [ ] Informe HTML autocontenido (Jinja2 + figuras embebidas como data-URI). **DoD:** genera un HTML válido a partir de resultados de ejemplo.
 
 ### 3.7 Cobertura y API pública
-- [ ] `riskaudit.audit.__init__` exporta las 6 funciones y los dataclasses de resultado.
+- [ ] `riskaudit.audit.__init__` exporta las 7 funciones y los dataclasses de resultado.
 - [ ] Activar `--cov-fail-under=90` para `riskaudit.audit` en pytest/CI.
 - **DoD:** `pytest --cov=riskaudit.audit` ≥ 90%.
 
@@ -316,12 +316,12 @@ Para cada función: firma estable, docstring con **definición matemática exact
 
 Cerrar la deuda de consistencia detectada en la revisión. Barato y desbloquea lo demás.
 
-- [ ] **Versión de fuente única.** Versión dinámica de hatchling (`[tool.hatch.version] path = "src/riskaudit/__init__.py"`, `dynamic = ["version"]`), para que pyproject / `__init__` / test / CITATION no vuelvan a desfasarse. **DoD:** `riskaudit.__version__` == la versión del build; el test lo verifica.
-- [ ] **`CITATION.cff` al día** (hoy dice `0.1.0`; el paquete es 0.1.2). **DoD:** versión de CITATION == versión del paquete.
-- [ ] **`py.typed`** en `src/riskaudit/`. **DoD:** el marcador se empaqueta en el wheel.
-- [ ] **Cerrar hueco de cobertura:** test que renderiza un `RobustnessResult` vía `audit_report`. **DoD:** cobertura de `riskaudit.audit` vuelve a ~99%.
-- [ ] **Docs consistentes:** marcar `label_robustness` como entregado en `docs/roadmap-v2.md`; confirmar que ningún doc lo lista como pendiente. **DoD:** grep limpio.
-- [ ] **Checklist de release** en uso (ver `PROTOCOL.md §9`): `ruff check . && ruff format --check . && pytest --cov=riskaudit.audit --cov-fail-under=90` antes de cada tag. **DoD:** se corre antes de taggear.
+- [x] **Versión de fuente única.** Versión dinámica de hatchling (`[tool.hatch.version] path = "src/riskaudit/__init__.py"`, `dynamic = ["version"]`), para que pyproject / `__init__` / test / CITATION no vuelvan a desfasarse. **DoD:** `test_smoke` verifica `__version__ == importlib.metadata.version("riskaudit")`.
+- [x] **`CITATION.cff` al día** — `version: 0.1.2`, `date-released: 2026-07-21`.
+- [x] **`py.typed`** en `src/riskaudit/` (se empaqueta por estar dentro del paquete del wheel).
+- [x] **Cerrar hueco de cobertura:** `test_audit_report_renders_every_result_type` cubre ahora `RobustnessResult` (ambas ramas: ε y "beyond the grid").
+- [x] **Docs consistentes:** `label_robustness` marcado entregado en `docs/roadmap-v2.md`; base a v0.1.2.
+- [x] **Checklist de release** en uso (ver `PROTOCOL.md §9`): `ruff check . && ruff format --check . && pytest --cov=riskaudit.audit --cov-fail-under=90` antes de cada tag.
 
 ## v0.2 · Fase A — Validación canónica (Obermeyer 2019) · el ancla
 
@@ -351,7 +351,7 @@ Una función por sesión: investigar → firma + AC → implementar contra el AP
 
 ## Checklist maestro v0.2 (una vista)
 
-- [ ] Fase 0: versión única · `CITATION` al día · `py.typed` · cobertura ~99% · docs consistentes · checklist de release
+- [x] Fase 0: versión única · `CITATION` al día · `py.typed` · cobertura ~99% · docs consistentes · checklist de release
 - [ ] Fase A: validación Obermeyer reproducible en <15 min
 - [ ] Fase B: `group_capture` · `label_blend_frontier`
 - [ ] Release v0.2.0 publicado · CI verde
