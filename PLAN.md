@@ -345,16 +345,16 @@ Una función por sesión: investigar → firma + AC → implementar contra el AP
 
 ## v0.2 · Release v0.2.0
 
-- [ ] Bump versión (fuente única) → `0.2.0`; `CHANGELOG.md`; tabla de funciones del README al día.
-- [ ] `git tag v0.2.0` → `publish.yml` publica solo.
-- **DoD:** `pip install --upgrade riskaudit` == 0.2.0; PyPI muestra el README al día; CI verde.
+- [x] Bump versión (fuente única) → `0.2.0`; `CHANGELOG.md`; tabla de funciones del README al día.
+- [x] `git tag v0.2.0` empujado → `publish.yml` disparado.
+- [ ] **DoD (verificar):** `pip install --upgrade riskaudit` == 0.2.0; PyPI muestra el README al día; CI verde en el commit del release.
 
 ## Checklist maestro v0.2 (una vista)
 
 - [x] Fase 0: versión única · `CITATION` al día · `py.typed` · cobertura ~99% · docs consistentes · checklist de release
 - [x] Fase A: validación Obermeyer reproducible en <15 min
 - [x] Fase B: `group_capture` · `label_blend_frontier`
-- [ ] Release v0.2.0 publicado · CI verde
+- [~] Release v0.2.0: tag empujado, `publish.yml` corriendo · confirmar en PyPI/Actions
 
 ---
 
