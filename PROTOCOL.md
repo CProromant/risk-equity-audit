@@ -262,4 +262,6 @@ Después, autorizar fase por fase. Para la Fase 1, recordarle el guardrail 1 (ve
 
 Del **backlog §7** (fairlearn, CLI, mkdocs, preprint) nada entra en v0.2: sigue diferido. v0.2 es solo validación + equidad.
 
+**Estructura actual (reemplaza al árbol §2, que queda como registro v0.1).** `src/riskaudit/` es *solo* la librería (`audit/`, `_config.SEED`, `py.typed`); el wheel no incluye el pipeline. Los ejemplos viven fuera del paquete: `examples/benchmark/` (sintético controlado con respuesta conocida), `examples/meps/` (pipeline MEPS real, paquete `meps`, corrido con `PYTHONPATH=examples`), y `validation/obermeyer_2019/`. Detalle en `docs/decisions.md` (2026-07-21).
+
 **Guardrails que siguen vigentes:** pesos y varianza de diseño siempre (guardrail 3); honestidad sobre límites (el nulo no-psiquiátrico se reporta, no se esconde); nombres MEPS verificados contra codebook (guardrail 1); nada de datos en git (guardrail 5); cobertura de `riskaudit.audit` ≥ 90%.

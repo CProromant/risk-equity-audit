@@ -2,7 +2,10 @@ import numpy as np
 import pandas as pd
 from lightgbm import LGBMRegressor
 
-from riskaudit._config import ARTIFACTS_DIR, SEED
+from meps._paths import ARTIFACTS_DIR
+from meps.etl.meps import load_panel
+from meps.features import build_features
+from riskaudit._config import SEED
 from riskaudit.audit import (
     SurveyDesign,
     ablation,
@@ -13,8 +16,6 @@ from riskaudit.audit import (
     regression_to_mean,
     top_k_capture,
 )
-from riskaudit.etl.meps import load_panel
-from riskaudit.features import build_features
 
 
 def _fit(X, y):

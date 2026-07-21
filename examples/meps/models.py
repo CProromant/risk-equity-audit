@@ -8,8 +8,9 @@ from lightgbm import LGBMClassifier, LGBMRegressor
 from sklearn.metrics import r2_score, roc_auc_score
 from sklearn.model_selection import StratifiedKFold
 
-from riskaudit._config import ARTIFACTS_DIR, SEED
-from riskaudit.features import FeatureMatrix
+from meps._paths import ARTIFACTS_DIR
+from meps.features import FeatureMatrix
+from riskaudit._config import SEED
 
 # target -> "clf" (binary, scored by AUC) or "reg" (scored by weighted R^2)
 _TASKS = {"spend": "reg", "avoidable_util_bin": "clf", "k6": "reg"}

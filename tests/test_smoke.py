@@ -1,8 +1,6 @@
 import importlib
 from importlib.metadata import version
 
-import pytest
-
 from riskaudit import SEED, __version__
 
 
@@ -14,6 +12,5 @@ def test_version_is_single_sourced():
     assert __version__ == version("riskaudit")
 
 
-@pytest.mark.parametrize("name", ["riskaudit.audit", "riskaudit.etl"])
-def test_subpackage_imports(name):
-    assert importlib.import_module(name) is not None
+def test_audit_subpackage_imports():
+    assert importlib.import_module("riskaudit.audit") is not None

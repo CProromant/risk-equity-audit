@@ -4,7 +4,7 @@ import pandas as pd
 import pyreadstat
 import yaml
 
-from riskaudit._config import PROCESSED_DIR, RAW_DIR
+from meps._paths import PROCESSED_DIR, RAW_DIR
 
 _DICT = Path(__file__).with_name("dictionary.yml")
 

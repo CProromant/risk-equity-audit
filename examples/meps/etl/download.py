@@ -5,7 +5,7 @@ from pathlib import Path
 
 import requests
 
-from riskaudit._config import DATA_DIR, RAW_DIR
+from meps._paths import DATA_DIR, RAW_DIR
 
 # Core FYC + Panel 26 (Phase 1). Conditions (h231) and Prescribed Medicines
 # (h229a), both 2021, feed the mental-health treatment proxy (Phase 2).

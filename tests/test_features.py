@@ -1,7 +1,6 @@
 import numpy as np
 import pandas as pd
-
-from riskaudit.features import build_features
+from meps.features import build_features
 
 _CONST = [
     "age_t",

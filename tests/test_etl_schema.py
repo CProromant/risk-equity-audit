@@ -1,4 +1,4 @@
-from riskaudit.etl.meps import _spec
+from meps.etl.meps import _spec
 
 
 def test_panel_standard_names_present_and_documented():

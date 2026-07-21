@@ -81,7 +81,7 @@ A worked example on U.S. MEPS 2021–2023 shows the tool finds real bias — a d
 
 **Findings** (weighted, design-based CIs): the spend model captures only ~15% of top-decile K6 need — barely above the ~10% random floor, far below the ~41% oracle; a need-trained model reaches ~29%. Among the people the spend model deprioritizes, those in distress run up more *total* future cost than it predicted (incremental lift +0.8 log-dollars with the mental-health features, +1.0 without — both 95% CIs exclude zero): the bias comes from the **label, not from missing information**.
 
-**Honest limit.** That excess does **not** appear on non-psychiatric utilization (ER + hospitalizations; lift ≈ 0, CI includes zero), so I do *not* claim the distress surfaces specifically as non-psychiatric spending — the total-spend excess may be partly mental-health spending, and a clean test needs a non-psychiatric spend target (backlog). The severe-untreated subgroup (n ≈ 40) is descriptive only. The figures regenerate from the pipeline with `python docs/make_figures.py`.
+**Honest limit.** That excess does **not** appear on non-psychiatric utilization (ER + hospitalizations; lift ≈ 0, CI includes zero), so I do *not* claim the distress surfaces specifically as non-psychiatric spending — the total-spend excess may be partly mental-health spending, and a clean test needs a non-psychiatric spend target (backlog). The severe-untreated subgroup (n ≈ 40) is descriptive only. The figures regenerate from the pipeline with `make figures`.
 
 ## Validation
 

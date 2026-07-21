@@ -10,12 +10,12 @@ from pathlib import Path
 import matplotlib.pyplot as plt
 import pandas as pd
 
-from riskaudit._config import ARTIFACTS_DIR
+from meps._paths import ARTIFACTS_DIR
+from meps.etl.meps import load_panel
+from meps.features import build_features
 from riskaudit.audit import label_choice_curve, top_k_capture
-from riskaudit.etl.meps import load_panel
-from riskaudit.features import build_features
 
-IMG = Path(__file__).with_name("img")
+IMG = Path(__file__).resolve().parents[2] / "docs" / "img"
 NEED = "#4C78A8"  # need-trained model
 SPEND = "#E4572E"  # spend-trained model (the finding)
 REF = "#c9c9c9"  # oracle / floor references

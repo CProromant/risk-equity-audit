@@ -2,9 +2,8 @@ import json
 
 import numpy as np
 import pandas as pd
-
-from riskaudit.features import FeatureMatrix
-from riskaudit.models import train_all
+from meps.features import FeatureMatrix
+from meps.models import train_all
 
 
 def _features(n=250):

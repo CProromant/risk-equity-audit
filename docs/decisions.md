@@ -140,3 +140,23 @@ direcciones**, no magnitudes. Detalle en `validation/obermeyer_2019/COVERAGE.md`
 Se usa el conteo de condiciones crónicas activas (`gagne_sum_t`) como `need` — la medida de
 salud que el paper argumenta que el algoritmo debería seguir. `scores` = `risk_score_t` (el
 score de costo desplegado). Tramo = top-3% (umbral p97 de auto-enroll del paper).
+
+## 2026-07-21 — v0.2: reestructura de ejemplos (el core queda solo con la librería)
+
+Desviación del PROTOCOL §2 (estructura). El producto es `riskaudit.audit`; el pipeline MEPS y
+el sintético eran carga en el paquete. Nueva estructura:
+
+- **`src/riskaudit/`** = solo la librería: `audit/`, `_config.SEED`, `py.typed`. El wheel ya no
+  incluye ETL/features/models.
+- **`examples/meps/`** = el pipeline MEPS movido tal cual (paquete `meps`: `etl/`, `features.py`,
+  `models.py`, `scripts/`, `make_figures.py`), con sus paths en `meps._paths` (antes en
+  `_config`). Se corre con `examples/` en el path: `make {download,etl,models,audit,figures}`
+  usan `PYTHONPATH=examples python -m meps.scripts.…`. Los tests de MEPS siguen en `tests/` y
+  ven `meps` vía un `conftest.py` en la raíz.
+- **`examples/benchmark/`** = el antiguo `demo/`, subido a **benchmark controlado**: planta un
+  sesgo conocido y corre las 10 funciones (con diseño, subgrupos y frontera), así doblan como
+  chequeo end-to-end de que las herramientas recuperan la respuesta plantada.
+
+No es breaking para la API pública (siempre fue `riskaudit.audit`). Narrativa de ejemplos en
+tres niveles: benchmark sintético (respuesta conocida) → Obermeyer (caso canónico) → MEPS
+(datos reales de encuesta, opcional).

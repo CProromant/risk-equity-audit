@@ -1,6 +1,5 @@
 import pandas as pd
-
-from riskaudit.etl.meps import _clean
+from meps.etl.meps import _clean
 
 
 def _raw():

@@ -1,6 +1,6 @@
 import pandas as pd
 
-from riskaudit._config import ARTIFACTS_DIR, PROCESSED_DIR
+from meps._paths import ARTIFACTS_DIR, PROCESSED_DIR
 
 
 def main() -> None:
