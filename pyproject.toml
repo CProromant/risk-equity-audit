@@ -61,7 +61,7 @@ src = ["src", "tests"]
 select = ["E", "F", "I", "UP", "B", "SIM"]
 
 [tool.pytest.ini_options]
-testpaths = ["tests"]
+testpaths = ["tests", "examples", "validation"]
 addopts = "-q"
 
 [tool.coverage.run]

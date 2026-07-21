@@ -9,7 +9,7 @@ pytestmark = pytest.mark.skipif(
     reason="set RISKAUDIT_RUN_VALIDATION=1 to run the Obermeyer validation (downloads ~18 MB)",
 )
 
-sys.path.insert(0, str(Path(__file__).resolve().parents[1]))  # repo root → validation package
+sys.path.insert(0, str(Path(__file__).resolve().parents[3]))  # repo root → validation package
 
 
 def test_reproduces_obermeyer_direction():
