@@ -4,7 +4,6 @@ artifacts/
 *.dta
 *.zip
 *.parquet
-demo_report.html
 benchmark_report.html
 
 # Keep the data tree and the checksum manifest

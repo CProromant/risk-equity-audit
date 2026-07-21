@@ -7,4 +7,3 @@ ARTIFACTS_DIR = PROJECT_ROOT / "artifacts"
 
 RAW_DIR = DATA_DIR / "raw"
 PROCESSED_DIR = DATA_DIR / "processed"
-SYNTHETIC_DIR = DATA_DIR / "synthetic"

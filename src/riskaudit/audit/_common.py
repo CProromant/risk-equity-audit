@@ -71,6 +71,13 @@ def wmean(x: np.ndarray, w: np.ndarray) -> float:
     return float(np.sum(w * x) / np.sum(w))
 
 
+def rank01(x: np.ndarray) -> np.ndarray:
+    """Ranks of ``x`` scaled to [0, 1], stable on ties (0 for a single element)."""
+    r = np.empty(x.shape[0])
+    r[np.argsort(x, kind="stable")] = np.arange(x.shape[0])
+    return r / (x.shape[0] - 1) if x.shape[0] > 1 else r
+
+
 def weighted_capture(scores: np.ndarray, need: np.ndarray, weights: np.ndarray, k: float) -> float:
     """Weighted share of total need falling in the top-``k`` (by weight) of ``scores``."""
     mask = topk_mask(scores, weights, k)

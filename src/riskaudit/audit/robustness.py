@@ -3,7 +3,13 @@ from dataclasses import dataclass
 import numpy as np
 from numpy.typing import ArrayLike
 
-from riskaudit.audit._common import check_inputs, to_float, weighted_capture, weights_or_ones
+from riskaudit.audit._common import (
+    check_inputs,
+    rank01,
+    to_float,
+    weighted_capture,
+    weights_or_ones,
+)
 
 
 @dataclass
@@ -13,12 +19,6 @@ class RobustnessResult:
     oracle_capture: np.ndarray
     gap: np.ndarray
     breakdown: float  # smallest epsilon that halves the clean capture gap (nan if no gap)
-
-
-def _rank01(x: np.ndarray) -> np.ndarray:
-    r = np.empty(x.shape[0])
-    r[np.argsort(x, kind="stable")] = np.arange(x.shape[0])
-    return r / (x.shape[0] - 1) if x.shape[0] > 1 else r
 
 
 def label_robustness(
@@ -70,7 +70,7 @@ def label_robustness(
     check_inputs(scores=s, need=n, weights=w)
     grid = np.linspace(0, 1, 11) if grid is None else np.asarray(grid, dtype=float)
 
-    nr, sr = _rank01(n), _rank01(s)
+    nr, sr = rank01(n), rank01(s)
     perturbed = [(1 - e) * nr + e * sr for e in grid]
     model = np.array([weighted_capture(s, p, w, k) for p in perturbed])
     oracle = np.array([weighted_capture(p, p, w, k) for p in perturbed])

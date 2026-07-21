@@ -7,17 +7,12 @@ from riskaudit.audit._common import (
     SurveyDesign,
     boot_ci,
     check_inputs,
+    rank01,
     to_float,
     topk_mask,
     weighted_capture,
     weights_or_ones,
 )
-
-
-def _rank01(x: np.ndarray) -> np.ndarray:
-    r = np.empty(x.shape[0])
-    r[np.argsort(x, kind="stable")] = np.arange(x.shape[0])
-    return r / (x.shape[0] - 1) if x.shape[0] > 1 else r
 
 
 def label_blend_frontier(
@@ -74,7 +69,7 @@ def label_blend_frontier(
     nd = to_float(need)
     w = weights_or_ones(weights, a.shape[0])
     check_inputs(scores_a=a, scores_b=b, need=nd, weights=w)
-    ra, rb = _rank01(a), _rank01(b)
+    ra, rb = rank01(a), rank01(b)
     alphas = np.linspace(0, 1, 11) if alphas is None else np.asarray(alphas, dtype=float)
 
     g = None if groups is None else np.asarray(groups)
