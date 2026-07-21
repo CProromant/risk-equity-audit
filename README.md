@@ -65,6 +65,7 @@ This is **label-choice bias** — an algorithm trained on cost as a proxy for ne
 | `ablation(fit_fn, X, y, feature_groups, need, k, weights)` | Cross-fitted: how much does *global performance* drop vs. how much does *capture of need* collapse when a feature group is removed? |
 | `incremental_lift(y_t1, y_pred, distress, scores, k, weights)` | **The contribution metric:** among the deprioritized, do those in need generate *more future outcome than predicted*? Makes the argument non-circular. |
 | `regression_to_mean(y_t, y_t1, scores_t, k, weights)` | How much of a top-*k* outcome drop is just regression to the mean? (descriptive) |
+| `label_robustness(scores, need, weights, k)` | How wrong the `need` label would have to be to explain away the gap. |
 | `audit_report(results, out_html)` | Bundles everything into a self-contained HTML report. |
 
 ## The MEPS example
@@ -92,7 +93,7 @@ No data is stored in this repository. Only download scripts and checksums are ve
 Honesty about limits is a feature of this project, not a footnote:
 
 - **The severe untreated subgroup is small** (~40 in the analytic sample) — reported descriptively with wide CIs, never modeled. The robust finding is the population-level mechanism, not an anecdote about invisible patients.
-- **"Need" is a normative choice.** Calling a model "biased" asserts which target is legitimate need; that judgment is stated and defended in [`docs/methods.md`](docs/methods.md), not assumed.
+- **"Need" is a normative choice.** Calling a model "biased" asserts which target is legitimate need; that judgment is stated and defended in [`docs/methods.md`](docs/methods.md), not assumed. `label_robustness` stress-tests it.
 - **Survey design is respected throughout** — sample weights and a stratified cluster bootstrap over VARSTR/VARPSU, never unweighted or naïvely filtered.
 
 ## Roadmap
@@ -169,6 +170,7 @@ Esto es el **sesgo por elección de la etiqueta**: un algoritmo entrenado con el
 | `ablation` | Cross-fitted: ¿cuánto baja el *desempeño global* vs. cuánto se desploma la *captura de necesidad* al quitar un grupo de features? |
 | `incremental_lift` | **La métrica-contribución:** entre los deprioritizados, ¿los que tienen necesidad generan *más desenlace futuro del predicho*? Hace no-circular el argumento. |
 | `regression_to_mean` | ¿Cuánto de una caída del top-*k* es solo regresión a la media? (descriptivo) |
+| `label_robustness` | ¿Cuán equivocada tendría que estar la etiqueta `need` para explicar la brecha? |
 | `audit_report` | Empaqueta todo en un informe HTML autocontenido. |
 
 ## El ejemplo MEPS
@@ -189,7 +191,7 @@ Un ejemplo sobre MEPS 2021–2023 (EE.UU.) muestra que la herramienta encuentra 
 La honestidad sobre los límites es parte del proyecto, no una nota al pie:
 
 - **El subgrupo severo no tratado es pequeño** (~40 en la muestra analítica): descriptivo, con IC anchos, nunca se modela. El hallazgo robusto es el mecanismo poblacional, no la anécdota de "los invisibles".
-- **"Necesidad" es una elección normativa** — se declara y defiende en [`docs/methods.md`](docs/methods.md).
+- **"Necesidad" es una elección normativa** — se declara y defiende en [`docs/methods.md`](docs/methods.md); `label_robustness` la somete a estrés.
 - **El diseño muestral se respeta siempre:** pesos y bootstrap de clúster estratificado sobre VARSTR/VARPSU, nunca sin ponderar.
 
 ## Licencia
