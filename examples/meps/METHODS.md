@@ -1,10 +1,10 @@
-# Methods
+# MEPS case study — methods
 
-Binding statistical reference for `risk-equity-audit`. Every metric in
-`riskaudit.audit` and every modeling choice in the MEPS case study is defined or
-justified here; the decisions themselves are logged in `docs/decisions.md`. Where
-a function's docstring already carries the exact formula (PROTOCOL §4.4), this
-file gives the reasoning and points to it rather than repeating it.
+Statistical methods and modeling choices for the **MEPS worked example**
+(`examples/meps`). The library's per-metric math lives in the `riskaudit.audit`
+docstrings; this file gives the case-study reasoning — what counts as need, the
+design-based estimation, model comparability — and the honest limits. Decisions
+are logged in `docs/decisions.md`.
 
 ## 1. What counts as "need" (D2, D5)
 

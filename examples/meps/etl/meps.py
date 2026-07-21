@@ -84,7 +84,7 @@ def _treated_ids(cond: pd.DataFrame, pmed: pd.DataFrame) -> set:
 
 
 def build_treatment_proxy(raw_dir: Path = RAW_DIR, out_path: Path | None = None) -> Path:
-    """Person-level 2021 mental-health treatment flag (docs/methods.md §1).
+    """Person-level 2021 mental-health treatment flag (examples/meps/METHODS.md §1).
 
     Treated = a mental-health condition (ICD-10 F* or CCSR MBD*) in HC-231, or a
     psychotropic prescription (Multum class in ``_MH_TC1``) in HC-229A.

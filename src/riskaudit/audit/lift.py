@@ -49,7 +49,7 @@ def incremental_lift(
     the outcome the model targets. A positive lift means the model was blind to
     real downstream need concentrated in the distressed — the non-circular core
     of the argument, since :math:`y_{t+1}` is the model's own currency, not the
-    distress measure (``docs/methods.md`` §2).
+    distress measure (``examples/meps/METHODS.md`` §2).
 
     Parameters
     ----------

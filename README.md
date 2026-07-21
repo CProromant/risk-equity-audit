@@ -103,7 +103,7 @@ No data is stored in this repository. Only download scripts and checksums are ve
 Honesty about limits is a feature of this project, not a footnote:
 
 - **The severe untreated subgroup is small** (~40 in the analytic sample) — reported descriptively with wide CIs, never modeled. The robust finding is the population-level mechanism, not an anecdote about invisible patients.
-- **"Need" is a normative choice.** Calling a model "biased" asserts which target is legitimate need; that judgment is stated and defended in [`docs/methods.md`](docs/methods.md), not assumed. `label_robustness` stress-tests it.
+- **"Need" is a normative choice.** Calling a model "biased" asserts which target is legitimate need; that judgment is stated and defended in [`examples/meps/METHODS.md`](examples/meps/METHODS.md), not assumed. `label_robustness` stress-tests it.
 - **Survey design is respected throughout** — sample weights and a stratified cluster bootstrap over VARSTR/VARPSU, never unweighted or naïvely filtered.
 
 ## Roadmap
@@ -213,7 +213,7 @@ make validate-obermeyer   # baja ~18 MB (fijado por SHA-256), imprime la tabla y
 La honestidad sobre los límites es parte del proyecto, no una nota al pie:
 
 - **El subgrupo severo no tratado es pequeño** (~40 en la muestra analítica): descriptivo, con IC anchos, nunca se modela. El hallazgo robusto es el mecanismo poblacional, no la anécdota de "los invisibles".
-- **"Necesidad" es una elección normativa** — se declara y defiende en [`docs/methods.md`](docs/methods.md); `label_robustness` la somete a estrés.
+- **"Necesidad" es una elección normativa** — se declara y defiende en [`examples/meps/METHODS.md`](examples/meps/METHODS.md); `label_robustness` la somete a estrés.
 - **El diseño muestral se respeta siempre:** pesos y bootstrap de clúster estratificado sobre VARSTR/VARPSU, nunca sin ponderar.
 
 ## Referencia
