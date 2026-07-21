@@ -1,140 +1,107 @@
 # risk-equity-audit
 
-**Auditing label-choice bias in healthcare risk-stratification models — and the mental-health blind spot it creates.**
+**Auditing label-choice bias in healthcare risk-stratification models.**
 
-`riskaudit` is a Python toolkit that audits *any* risk-stratification model for **label-choice bias**: the systematic error that appears when a model is trained on the wrong proxy for "need" (typically **healthcare spending**) instead of need itself. The tool is the product; a reproducible worked example on U.S. MEPS data shows it finds real bias.
+`riskaudit` is a Python library that audits *any* risk-stratification model for **label-choice bias** — how much real "need" a model leaves behind when it is trained on a convenient proxy (usually healthcare **spending**) instead of need itself. It works on any model's output: give it the `scores` a model assigned, an independent `need` measure, and population `weights`.
 
 [![CI](https://github.com/CProromant/risk-equity-audit/actions/workflows/ci.yml/badge.svg)](https://github.com/CProromant/risk-equity-audit/actions/workflows/ci.yml)
 ![license](https://img.shields.io/badge/license-MIT-green)
 [![DOI](https://img.shields.io/badge/DOI-10.5281%2Fzenodo.21461268-blue)](https://doi.org/10.5281/zenodo.21461268)
 
-> **Project status.** **`v0.1.0` released** and archived on Zenodo (DOI above). The `riskaudit` auditing library is implemented and tested (7 functions, design-based CIs, ~99% coverage); the MEPS case study and a self-contained demo run end to end. Built phase by phase per [`PROTOCOL.md`](PROTOCOL.md) and [`PLAN.md`](PLAN.md).
+<p align="center">
+  <img src="https://raw.githubusercontent.com/CProromant/risk-equity-audit/main/docs/img/capture.png" width="720"
+       alt="Top-decile capture of measured need on MEPS: oracle 41 percent, need-trained model 29 percent, spend-trained model 15 percent, random floor 10 percent.">
+</p>
+
+<p align="center"><sub><code>riskaudit</code>'s own output on the MEPS example: a deployed spend-trained model captures barely more measured need than a random score — and less than half of what ranking by need would.</sub></p>
 
 *(Versión en español más abajo — [ir al español](#español).)*
 
 ---
 
-## What this is
-
-Health systems have limited budgets for expensive programs — case management, home visits, close follow-up — so a model decides **who gets prioritized**, usually by predicting who is "high risk." The catch is *how you define* high risk. Most deployed models define it as **"who will spend the most,"** because spending is recorded for everyone.
-
-That choice has a blind spot. Consider someone in psychological distress who **does not seek care**: their observed spending is near zero, so a spend-trained model labels them *low risk* and ignores them — and the concern is that untreated distress may surface next year as other medical need (ER visits, worsened physical illness). The need was there; the label never looked for it.
-
-This is **label-choice bias**: a well-documented failure where an algorithm trained on cost as a proxy for need under-serves people whose need hasn't yet turned into spending. This project applies that lens to **untreated mental-health need** and packages the audit as a reusable tool.
-
-**The claim in one sentence:** a risk model trained on healthcare spending captures barely more measured need than a coin flip and systematically under-serves people in psychological distress — because the *label* (spending), not the algorithm, decides who counts as high risk. This project measures that label-choice cost on MEPS.
-
----
-
-## What's in the box
-
-1. **`riskaudit`** — an installable Python package that audits label-choice bias in any risk-stratification model. **This is the product:** a reusable tool that does not depend on any particular dataset.
-2. **A worked example on MEPS 2021–2023** — a reproducible pipeline (three targets, identical models, full audit) that shows the tool finds real bias on U.S. survey data. It is a demonstration, not the point.
-3. **End-to-end demo** — a self-contained synthetic run (`demo/run_demo.py`), with **no credentials and no PHI**, so anyone can see the tool working in seconds.
-
----
-
-## The `riskaudit` toolkit
-
-`riskaudit` does **not** train models or make predictions. It is an **auditor**: give it the scores a model assigned and an independent measure of real need, and it quantifies how much need the model leaves behind — with population weights and confidence intervals (a plain row bootstrap, or a design-based one over survey strata/PSUs).
-
-Because it works purely on scores and a need measure, `riskaudit` is **domain- and country-agnostic**: the same functions audit a hospital's readmission model, an insurer's cost model, or a ministry's triage algorithm. The MEPS mental-health study below is one worked example showing the tool finds real bias — an illustration, not the tool's scope.
-
-| Function | Question it answers |
-|---|---|
-| `top_k_capture(scores, need, k, weights)` | Of all real need in the population, what fraction lands in the top-*k* the model prioritizes? |
-| `reclassification(scores_a, scores_b, k, weights)` | If we switch the label from A to B, **who** enters and leaves the priority list? |
-| `ablation(fit_fn, X, y, feature_groups, k, weights)` | If we remove a feature group and retrain, how much does *global performance* drop vs. how much does *capture of that group* collapse? |
-| `label_choice_curve(scores, need, weights, bins)` | Curve of score percentile vs. observed mean need — where does high need sit on the score? |
-| `regression_to_mean(y_t, y_t1, scores_t, k, weights)` | How much of the top-*k* spending drop from year *t* to *t+1* is just regression to the mean? |
-| `incremental_lift(y_t1, y_pred, distress, scores, k, weights)` | **The contribution metric:** among people the model deprioritizes, do those with measured need generate *more future outcome than predicted* than the rest? Makes the argument non-circular. |
-| `audit_report(results, out_html)` | Bundles everything into a self-contained HTML report. |
-
-**What the audit finds on MEPS** (weighted, with design-based confidence intervals): the spend-trained model captures only ~15% of top-decile K6 need — barely above the ~10% a random score gets, and far below the ~41% an oracle (ranking by need itself) reaches; a need-trained model reaches ~29%. Among the people the spend model deprioritizes, those in distress run up more *total* future cost than it predicted (incremental lift +0.8 log-dollars with the mental-health features, +1.0 without — both 95% CIs exclude zero), so the bias comes from the **label, not from missing information**.
-
-**Honest limit.** That excess does **not** appear on non-psychiatric utilization (ER + hospitalizations; lift ≈ 0, CI includes zero), so we do *not* claim the distress surfaces specifically as non-psychiatric spending — the total-spend excess may be partly mental-health spending, and a clean test needs a non-psychiatric spend target (backlog). The severe-untreated subgroup (n ≈ 40) is descriptive only.
-
----
-
 ## Install
-
-Requires Python ≥ 3.11.
 
 ```bash
 pip install riskaudit
 ```
 
-The core install is light (numpy, pandas, scikit-learn, matplotlib). For the MEPS example's heavier stack, add the extra: `pip install "riskaudit[meps]"`. For development, install from source:
-
-```bash
-git clone https://github.com/CProromant/risk-equity-audit.git
-cd risk-equity-audit
-pip install -e ".[dev]"
-```
+Python ≥ 3.11. The core is light (numpy, pandas, scikit-learn, matplotlib); the MEPS example's heavier stack is an extra: `pip install "riskaudit[meps]"`.
 
 ## Quickstart
 
-Minimal end-to-end audit on your own model's scores:
+Audit your own model's scores in a few lines — no training, no PHI:
 
 ```python
 import numpy as np
-from riskaudit.audit import top_k_capture, label_choice_curve, audit_report
+from riskaudit.audit import top_k_capture
 
 rng = np.random.default_rng(2026)
-n = 5_000
-scores  = rng.random(n)            # what your risk model output per person
-need    = rng.random(n)            # an independent measure of real need
-weights = rng.random(n)            # survey / population weights
+scores  = rng.random(5_000)   # what your risk model output per person
+need    = rng.random(5_000)   # an independent measure of real need
+weights = rng.random(5_000)   # population / survey weights
 
-capture = top_k_capture(scores, need, k=0.10, weights=weights)
-curve   = label_choice_curve(scores, need, weights=weights, bins=20)
-
-print(f"Top-decile capture of need: {capture.value:.1%}")
-audit_report({"capture": capture, "curve": curve}, out_html="audit.html")
+c = top_k_capture(scores, need, k=0.10, weights=weights)
+print(f"top-decile capture: {c.value:.0%}  (floor {c.baseline:.0%}, oracle {c.oracle:.0%})")
+# top-decile capture: 10%  (floor 10%, oracle 19%)   <- a random score sits at the floor
 ```
 
-The audit API above runs today, and a self-contained synthetic demo shows the whole flow end to end:
+Every result carries a confidence interval (row or design-based) and reads against its **floor** (a random score) and **oracle** (ranking by need itself) — a capture number is meaningless without them. `audit_report(results, "audit.html")` bundles the whole set into a self-contained HTML report.
 
-```bash
-python demo/run_demo.py   # no real data, no PHI, a few seconds, writes demo_report.html
-```
+## What this is
 
----
+Health systems have limited budgets for expensive programs, so a model decides **who gets prioritized** — usually by predicting who will "spend the most," because spending is recorded for everyone. That choice has a blind spot: someone in psychological distress who **does not seek care** has near-zero spending, so a spend-trained model calls them low risk and never looks. The need was there; the *label* never looked for it.
+
+This is **label-choice bias** — an algorithm trained on cost as a proxy for need under-serves people whose need hasn't turned into spending. `riskaudit` measures it, on any model, without retraining.
+
+## The toolkit
+
+`riskaudit` does **not** train models or make predictions. It is an **auditor**: give it scores and an independent need measure, and it quantifies how much need the model leaves behind — weighted, with a row or design-based (VARSTR/PSU) confidence interval. Because it works purely on `scores` + `need` + `weights`, it is **domain- and country-agnostic**: the same functions audit a hospital's readmission model, an insurer's cost model, or a ministry's triage algorithm.
+
+| Function | Question it answers |
+|---|---|
+| `top_k_capture(scores, need, k, weights)` | Of all real need, what fraction lands in the top-*k* the model prioritizes — vs. the random floor and the oracle ceiling? |
+| `reclassification(scores_a, scores_b, k, weights)` | If we switch the label from A to B, **who** enters and leaves the priority list? |
+| `label_choice_curve(scores, need, weights, bins)` | Where do the highest-need people sit on the score? |
+| `ablation(fit_fn, X, y, feature_groups, need, k, weights)` | Cross-fitted: how much does *global performance* drop vs. how much does *capture of need* collapse when a feature group is removed? |
+| `incremental_lift(y_t1, y_pred, distress, scores, k, weights)` | **The contribution metric:** among the deprioritized, do those in need generate *more future outcome than predicted*? Makes the argument non-circular. |
+| `regression_to_mean(y_t, y_t1, scores_t, k, weights)` | How much of a top-*k* outcome drop is just regression to the mean? (descriptive) |
+| `audit_report(results, out_html)` | Bundles everything into a self-contained HTML report. |
+
+## The MEPS example
+
+A worked example on U.S. MEPS 2021–2023 shows the tool finds real bias — a demonstration, not the point. The figure at the top is its headline; the curve below shows *where* the highest-need people land on each model's score.
+
+<p align="center">
+  <img src="https://raw.githubusercontent.com/CProromant/risk-equity-audit/main/docs/img/label_choice_curve.png" width="620"
+       alt="Label-choice curve: the need-trained model's mean need rises steeply with its score percentile; the spend-trained model's is much shallower.">
+</p>
+
+**Findings** (weighted, design-based CIs): the spend model captures only ~15% of top-decile K6 need — barely above the ~10% random floor, far below the ~41% oracle; a need-trained model reaches ~29%. Among the people the spend model deprioritizes, those in distress run up more *total* future cost than it predicted (incremental lift +0.8 log-dollars with the mental-health features, +1.0 without — both 95% CIs exclude zero): the bias comes from the **label, not from missing information**.
+
+**Honest limit.** That excess does **not** appear on non-psychiatric utilization (ER + hospitalizations; lift ≈ 0, CI includes zero), so I do *not* claim the distress surfaces specifically as non-psychiatric spending — the total-spend excess may be partly mental-health spending, and a clean test needs a non-psychiatric spend target (backlog). The severe-untreated subgroup (n ≈ 40) is descriptive only. The figures regenerate from the pipeline with `python docs/make_figures.py`.
 
 ## Data sources
 
 No data is stored in this repository. Only download scripts and checksums are versioned; everything under `data/` is git-ignored.
 
-- **Core — MEPS (AHRQ, U.S.):** HC-233 (2021), HC-243 (2022), HC-251 (2023), **HC-244 (Panel 26 Longitudinal 2021–2022)**, plus **HC-231** (2021 Conditions) and **HC-229A** (2021 Prescribed Medicines) for the mental-health treatment proxy — free, no registration; downloaded with SHA-256 checksums. See [`PROTOCOL.md`](PROTOCOL.md) §3 for exact files, weights, and codebook references.
+- **MEPS (AHRQ, U.S.):** HC-233/243/251 (FYC 2021–2023), **HC-244** (Panel 26 longitudinal), **HC-231** (Conditions) and **HC-229A** (Prescribed Medicines) for the treatment proxy — free, no registration, downloaded with SHA-256 checksums. See [`PROTOCOL.md`](PROTOCOL.md) §3.
 - **Synthetic (demo):** generated in-script by `demo/run_demo.py` — no external data, no real patients.
-
----
 
 ## Limitations
 
 Honesty about limits is a feature of this project, not a footnote:
 
-- **The severe untreated subgroup is small** (~135 people have severe distress, K6 ≥ 13, in both panel years; the untreated subset is smaller still). It is reported **descriptively, with wide confidence intervals** — never modeled. The robust finding is the population-level mechanism, not an anecdote about invisible patients.
-- **"Need" is a normative choice.** Calling a model "biased" requires asserting which target is the legitimate measure of need. That judgment is stated and defended in `docs/methods.md`, not assumed.
-- **Survey design is respected throughout** — final results always use sample weights and design-based variance (a stratified cluster bootstrap over VARSTR/VARPSU, with subpopulation/domain estimation), never unweighted or naïvely filtered.
+- **The severe untreated subgroup is small** (~40 in the analytic sample) — reported descriptively with wide CIs, never modeled. The robust finding is the population-level mechanism, not an anecdote about invisible patients.
+- **"Need" is a normative choice.** Calling a model "biased" asserts which target is legitimate need; that judgment is stated and defended in [`docs/methods.md`](docs/methods.md), not assumed.
+- **Survey design is respected throughout** — sample weights and a stratified cluster bootstrap over VARSTR/VARPSU, never unweighted or naïvely filtered.
 
----
+## Roadmap
 
-## Roadmap · Hoja de ruta
-
-Built phase by phase (see [`PLAN.md`](PLAN.md) for task-level detail and acceptance criteria):
-
-- **Phase 0** ✅ — Scaffolding: package layout, CI, tooling.
-- **Phase 1** ✅ — MEPS ETL: verified data dictionary, cleaned panel (6,741 persons).
-- **Phase 2** ✅ — Models + full weighted, design-based audit on MEPS.
-- **Phase 3** ✅ — `riskaudit.audit` API (~99% coverage) + self-contained synthetic demo.
-- **Phase 4** ✅ — Release `v0.1.0`, archived on Zenodo ([10.5281/zenodo.21461268](https://doi.org/10.5281/zenodo.21461268)).
+`v0.1.x` released (on PyPI, archived on Zenodo). Next (see [`docs/roadmap-v2.md`](docs/roadmap-v2.md)): validation against Obermeyer et al. 2019 on their public synthetic data, and API expansion — subgroup capture, the label-blend decision frontier, cost-of-blindness, and stability of the priority list. Closed list, one function at a time.
 
 ## How to cite
 
-If you use `riskaudit`, please cite it:
-
-> Proromant, C. (2026). *riskaudit: auditing label-choice bias in healthcare risk-stratification models* (v0.1.0) [Software]. Zenodo. https://doi.org/10.5281/zenodo.21461268
+> Proromant, C. (2026). *riskaudit: auditing label-choice bias in healthcare risk-stratification models* [Software]. Zenodo. https://doi.org/10.5281/zenodo.21461268
 
 Machine-readable metadata is in [`CITATION.cff`](CITATION.cff).
 
@@ -149,59 +116,81 @@ Machine-readable metadata is in [`CITATION.cff`](CITATION.cff).
 
 # risk-equity-audit (español)
 
-**Auditoría del sesgo por elección de etiqueta en modelos de estratificación de riesgo en salud — y el punto ciego de salud mental que produce.**
+**Auditoría del sesgo por elección de etiqueta en modelos de estratificación de riesgo en salud.**
 
-`riskaudit` es una herramienta en Python que audita *cualquier* modelo de estratificación de riesgo en busca de **sesgo por elección de la etiqueta** (*label-choice bias*): el error sistemático que aparece cuando el modelo se entrena con un proxy equivocado de "necesidad" (típicamente el **gasto sanitario**) en lugar de la necesidad misma. La herramienta es el producto; un ejemplo reproducible sobre datos de MEPS (EE.UU.) muestra que encuentra sesgo real.
+`riskaudit` es una librería en Python que audita *cualquier* modelo de estratificación de riesgo en busca de **sesgo por elección de la etiqueta** — cuánta "necesidad" real deja fuera un modelo cuando se entrena con un proxy cómodo (típicamente el **gasto sanitario**) en lugar de la necesidad misma. Trabaja sobre la salida de cualquier modelo: le das los `scores` que asignó, una medida independiente de `need` (necesidad) y `weights` poblacionales.
 
-> **Estado del proyecto.** **`v0.1.0` publicado** y archivado en Zenodo (DOI arriba). La librería de auditoría `riskaudit` está implementada y testeada (7 funciones, IC de diseño, ~99% de cobertura); el estudio MEPS y un demo auto-contenido corren de punta a punta. Construido por fases según [`PROTOCOL.md`](PROTOCOL.md) y [`PLAN.md`](PLAN.md).
+<p align="center">
+  <img src="https://raw.githubusercontent.com/CProromant/risk-equity-audit/main/docs/img/capture.png" width="720"
+       alt="Captura de necesidad medida en el top-decil (MEPS): oráculo 41 por ciento, modelo de necesidad 29 por ciento, modelo de gasto 15 por ciento, piso al azar 10 por ciento.">
+</p>
+
+<p align="center"><sub>Salida de la propia <code>riskaudit</code> sobre el ejemplo MEPS: un modelo desplegado entrenado con gasto captura la necesidad apenas por encima del azar — y menos de la mitad de lo que capturaría rankeando por necesidad.</sub></p>
+
+## Instalación
+
+```bash
+pip install riskaudit
+```
+
+Python ≥ 3.11. El core es liviano; para el ejemplo MEPS: `pip install "riskaudit[meps]"`.
+
+## Quickstart
+
+Audita los puntajes de tu propio modelo en pocas líneas — sin entrenar, sin datos sensibles:
+
+```python
+import numpy as np
+from riskaudit.audit import top_k_capture
+
+rng = np.random.default_rng(2026)
+scores, need, weights = rng.random(5_000), rng.random(5_000), rng.random(5_000)
+c = top_k_capture(scores, need, k=0.10, weights=weights)
+print(f"captura top-decil: {c.value:.0%}  (piso {c.baseline:.0%}, oráculo {c.oracle:.0%})")
+```
+
+Cada resultado trae IC (de filas o de diseño) y se lee contra su **piso** (score al azar) y su **oráculo** (rankear por la propia necesidad) — un número de captura no significa nada sin ellos. `audit_report(results, "audit.html")` empaqueta todo en un informe HTML autocontenido.
 
 ## Qué es esto
 
-Los sistemas de salud tienen presupuesto limitado para programas caros —gestión de caso, visitas domiciliarias, seguimiento cercano— así que un modelo decide **a quién se prioriza**, normalmente prediciendo quién es "de alto riesgo". El problema está en *cómo se define* ese alto riesgo. La mayoría de los modelos desplegados lo definen como **"quién va a gastar más"**, porque el gasto está registrado para todos.
+Los sistemas de salud tienen presupuesto limitado, así que un modelo decide **a quién se prioriza** — normalmente prediciendo quién "va a gastar más", porque el gasto está registrado para todos. Esa elección tiene un punto ciego: alguien con distrés que **no consulta** tiene gasto casi cero, así que un modelo entrenado con gasto lo etiqueta como bajo riesgo y nunca lo mira. La necesidad estaba; la *etiqueta* nunca la buscó.
 
-Esa elección tiene un punto ciego. Pensemos en una persona con distrés psíquico que **no consulta**: su gasto observado es casi cero, así que un modelo entrenado con gasto la etiqueta como *bajo riesgo* y la ignora — y la inquietud es que el distrés no tratado pueda reaparecer al año siguiente como otra necesidad médica (urgencias, enfermedades físicas agravadas). La necesidad estaba; la etiqueta nunca la buscó.
+Esto es el **sesgo por elección de la etiqueta**: un algoritmo entrenado con el costo como proxy de necesidad sub-atiende a quienes su necesidad aún no se tradujo en gasto. `riskaudit` lo mide, sobre cualquier modelo, sin reentrenar.
 
-Esto es el **sesgo por elección de la etiqueta**: una falla bien documentada en la que un algoritmo entrenado con el costo como proxy de necesidad sub-atiende a quienes su necesidad aún no se tradujo en gasto. Este proyecto aplica esa mirada a la **necesidad de salud mental no tratada** y empaqueta la auditoría como herramienta reutilizable.
+## La herramienta
 
-**La idea en una frase:** un modelo de riesgo entrenado con gasto sanitario captura la necesidad medida apenas por encima del azar y sub-atiende sistemáticamente a las personas con distrés psíquico — porque es la *etiqueta* (el gasto), no el algoritmo, la que decide quién es de alto riesgo. Este proyecto mide ese costo de la elección de etiqueta con MEPS.
-
-## Qué incluye
-
-1. **`riskaudit`** — paquete Python instalable que audita el sesgo por elección de etiqueta en cualquier modelo de estratificación de riesgo. **Es el producto:** una herramienta reutilizable que no depende de ninguna base en particular.
-2. **Un ejemplo demostrativo sobre MEPS 2021–2023** — pipeline reproducible (tres targets, modelos idénticos, auditoría completa) que muestra que la herramienta encuentra sesgo real con datos de EE.UU. Es una demostración, no el objetivo.
-3. **Demo end-to-end** — una corrida auto-contenida sobre datos sintéticos (`demo/run_demo.py`), **sin credenciales ni datos sensibles**, en segundos.
-
-## La herramienta `riskaudit`
-
-`riskaudit` **no** entrena modelos ni predice. Es un **auditor**: le das los puntajes que asignó un modelo y una medida independiente de necesidad real, y cuantifica cuánta necesidad el modelo deja fuera — con pesos poblacionales e intervalos de confianza (bootstrap de filas, o de diseño sobre estratos/PSU de la encuesta).
-
-Como trabaja solo con puntajes y una medida de necesidad, `riskaudit` es **agnóstico al dominio y al país**: las mismas funciones auditan el modelo de reingresos de un hospital, el de gasto de una aseguradora o el algoritmo de priorización de un ministerio. El estudio MEPS de salud mental de abajo es un ejemplo demostrativo que muestra que la herramienta encuentra sesgo real — una ilustración, no el alcance de la herramienta.
+`riskaudit` **no** entrena modelos ni predice. Es un **auditor**: le das scores y una medida independiente de necesidad, y cuantifica cuánta necesidad el modelo deja fuera — ponderado, con IC de filas o de diseño (VARSTR/PSU). Como trabaja solo con `scores` + `need` + `weights`, es **agnóstico al dominio y al país**: las mismas funciones auditan el modelo de reingresos de un hospital, el de gasto de una aseguradora o el algoritmo de priorización de un ministerio.
 
 | Función | Pregunta que responde |
 |---|---|
-| `top_k_capture` | De toda la necesidad real de la población, ¿qué fracción cae en el top-*k* que prioriza el modelo? |
+| `top_k_capture` | De toda la necesidad real, ¿qué fracción cae en el top-*k* — vs. el piso al azar y el oráculo? |
 | `reclassification` | Si cambio la etiqueta de A a B, ¿**quién** entra y sale de la lista de prioridad? |
-| `ablation` | Si quito un grupo de features y reentreno, ¿cuánto baja el *desempeño global* vs. cuánto se desploma la *captura* de ese grupo? |
-| `label_choice_curve` | Curva de percentil de score vs. necesidad observada media — ¿dónde cae la necesidad alta en el score? |
-| `regression_to_mean` | ¿Cuánto de la caída de gasto del top-*k* entre *t* y *t+1* es solo regresión a la media? |
-| `incremental_lift` | **La métrica-contribución:** entre los que el modelo deprioriza, ¿los que tienen necesidad medida generan *más desenlace futuro del predicho* que el resto? Hace no-circular el argumento. |
+| `label_choice_curve` | ¿Dónde caen las personas de mayor necesidad en el score? |
+| `ablation` | Cross-fitted: ¿cuánto baja el *desempeño global* vs. cuánto se desploma la *captura de necesidad* al quitar un grupo de features? |
+| `incremental_lift` | **La métrica-contribución:** entre los deprioritizados, ¿los que tienen necesidad generan *más desenlace futuro del predicho*? Hace no-circular el argumento. |
+| `regression_to_mean` | ¿Cuánto de una caída del top-*k* es solo regresión a la media? (descriptivo) |
 | `audit_report` | Empaqueta todo en un informe HTML autocontenido. |
 
-**Lo que encuentra la auditoría en MEPS** (ponderado, con IC de diseño): el modelo de gasto captura solo ~15% de la necesidad K6 del top-decil — apenas sobre el ~10% que daría un score al azar, y muy por debajo del ~41% de un oráculo (rankear por la propia necesidad); un modelo de K6 llega a ~29%. Entre las personas que el modelo de gasto deprioriza, las que están en distrés acumulan más gasto *total* futuro del que el modelo predijo (lift incremental +0.8 log-dólares con las features de salud mental, +1.0 sin ellas — ambos IC 95% excluyen el cero), así que el sesgo viene de la **etiqueta, no de falta de información**.
+## El ejemplo MEPS
 
-**Límite honesto.** Ese exceso **no** aparece en la utilización no-psiquiátrica (urgencias + hospitalizaciones; lift ≈ 0, IC incluye el cero), así que **no** afirmamos que el distrés se manifieste específicamente como gasto no psiquiátrico — el exceso de gasto total puede ser en parte gasto en salud mental, y un test limpio necesita un target de gasto no-psiquiátrico (backlog). El subgrupo severo no tratado (n ≈ 40) es solo descriptivo.
+Un ejemplo sobre MEPS 2021–2023 (EE.UU.) muestra que la herramienta encuentra sesgo real — una demostración, no el objetivo. La figura de arriba es el titular; la curva de abajo muestra *dónde* caen las personas de mayor necesidad en el score de cada modelo.
 
-## Instalación y quickstart
+<p align="center">
+  <img src="https://raw.githubusercontent.com/CProromant/risk-equity-audit/main/docs/img/label_choice_curve.png" width="620"
+       alt="Curva label-choice: la necesidad media del modelo de necesidad sube empinada con su percentil de score; la del modelo de gasto es mucho más superficial.">
+</p>
 
-`pip install riskaudit` (Python ≥ 3.11). El core es liviano; para el ejemplo MEPS: `pip install "riskaudit[meps]"`. El ejemplo mínimo de la API funciona hoy, y un demo auto-contenido muestra el flujo completo: `python demo/run_demo.py` (sin datos reales, sin PHI, segundos).
+**Hallazgos** (ponderado, IC de diseño): el modelo de gasto captura solo ~15% de la necesidad K6 del top-decil — apenas sobre el ~10% del azar, muy por debajo del ~41% del oráculo; un modelo de K6 llega a ~29%. Entre los deprioritizados por el modelo de gasto, los que están en distrés acumulan más gasto *total* futuro del predicho (lift +0.8 log-dólares con las features de salud mental, +1.0 sin ellas — ambos IC 95% excluyen el cero): el sesgo viene de la **etiqueta, no de falta de información**.
+
+**Límite honesto.** Ese exceso **no** aparece en la utilización no-psiquiátrica (urgencias + hospitalizaciones; lift ≈ 0, IC incluye el cero), así que **no** afirmo que el distrés se manifieste específicamente como gasto no psiquiátrico — un test limpio necesita un target de gasto no-psiquiátrico (backlog). El subgrupo severo no tratado (n ≈ 40) es solo descriptivo.
 
 ## Limitaciones
 
 La honestidad sobre los límites es parte del proyecto, no una nota al pie:
 
-- **El subgrupo severo no tratado es pequeño** (~135 personas con distrés severo, K6 ≥ 13, en ambos años del panel; el subgrupo *sin tratamiento* es aún menor): se reporta **descriptivamente, con IC anchos**, nunca se modela. El hallazgo robusto es el mecanismo poblacional, no la anécdota de "los invisibles".
-- **"Necesidad" es una elección normativa.** Llamar "sesgado" a un modelo exige afirmar cuál es la vara legítima de necesidad. Ese juicio se declara y defiende en `docs/methods.md`.
-- **El diseño muestral se respeta siempre:** los resultados finales usan pesos y varianza basada en el diseño (bootstrap de clúster estratificado sobre VARSTR/VARPSU, con estimación de subpoblación/dominio).
+- **El subgrupo severo no tratado es pequeño** (~40 en la muestra analítica): descriptivo, con IC anchos, nunca se modela. El hallazgo robusto es el mecanismo poblacional, no la anécdota de "los invisibles".
+- **"Necesidad" es una elección normativa** — se declara y defiende en [`docs/methods.md`](docs/methods.md).
+- **El diseño muestral se respeta siempre:** pesos y bootstrap de clúster estratificado sobre VARSTR/VARPSU, nunca sin ponderar.
 
 ## Licencia
 
