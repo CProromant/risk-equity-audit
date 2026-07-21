@@ -10,12 +10,23 @@
 [![DOI](https://img.shields.io/badge/DOI-10.5281%2Fzenodo.21461268-blue)](https://doi.org/10.5281/zenodo.21461268)
 ![license](https://img.shields.io/badge/license-MIT-green)
 
-<p align="center">
-  <img src="https://raw.githubusercontent.com/CProromant/risk-equity-audit/main/docs/img/capture.png" width="720"
-       alt="Top-decile capture of measured need on MEPS: oracle 41 percent, need-trained model 29 percent, spend-trained model 15 percent, random floor 10 percent.">
-</p>
+```mermaid
+%%{init: {'theme':'base','themeVariables':{'primaryColor':'#eef3f8','primaryBorderColor':'#8fa8c8','primaryTextColor':'#152536','lineColor':'#9aa1a9'}}}%%
+flowchart TD
+    N["People with real need"] --> Q{"Seek care?"}
+    Q -->|yes| V["Spending recorded — visible to the model"]
+    Q -->|no| H["Near-zero spending — invisible"]
+    V --> HI["ranked high-risk"]
+    H --> LO["ranked low-risk — the need was missed"]
+    LO --> B["Label-choice bias: the need the model leaves behind"]
+    B --> R["riskaudit measures the gap: capture vs. floor and oracle"]
+    classDef bias fill:#fbe3db,stroke:#E4572E,color:#7a2a14;
+    classDef tool fill:#dfeaf5,stroke:#4C78A8,color:#173a5e;
+    class B bias
+    class R tool
+```
 
-<p align="center"><sub><code>riskaudit</code>'s own output on the MEPS example: a deployed spend-trained model captures barely more measured need than a random score — and less than half of what ranking by need would.</sub></p>
+<sub>How label-choice bias arises — and where <code>riskaudit</code> measures it. A concept map, not a data chart; the numbers are in <a href="#evidence">Evidence</a>.</sub>
 
 *(Versión en español más abajo — [ir al español](#español).)*
 
@@ -51,18 +62,7 @@ print(f"top-decile capture: {c.value:.0%}  (floor {c.baseline:.0%}, oracle {c.or
 
 ## What it measures
 
-Health systems have limited budgets, so a model decides **who gets prioritized** — usually by predicting who will "spend the most," because spending is recorded for everyone. That choice has a blind spot: someone in distress who **does not seek care** has near-zero spending, so a spend-trained model calls them low-risk and never looks. The need was there; the *label* never looked for it. This is **label-choice bias** (Obermeyer et al., 2019).
-
-```mermaid
-flowchart TD
-    N["People with real need"] --> Q{"Seek care?"}
-    Q -->|yes| V["Spending recorded — visible to the model"]
-    Q -->|no| H["Near-zero spending — invisible"]
-    V --> HI["ranked high-risk"]
-    H --> LO["ranked low-risk — the need was missed"]
-    LO --> B["Label-choice bias: need the model leaves behind"]
-    B --> R["riskaudit measures the gap: capture vs. floor and oracle"]
-```
+Health systems have limited budgets, so a model decides **who gets prioritized** — usually by predicting who will "spend the most," because spending is recorded for everyone. That choice has a blind spot: someone in distress who **does not seek care** has near-zero spending, so a spend-trained model calls them low-risk and never looks. The need was there; the *label* never looked for it. This is **label-choice bias** (Obermeyer et al., 2019) — the mechanism sketched at the top of this page.
 
 For a score $s$, an independent need measure $n$, and survey weights $w$, the top-$k$ **capture** is the weighted share of all need that lands in the highest-scoring group holding a fraction $k$ of the population:
 
@@ -80,6 +80,7 @@ The **label-choice cost** of training on a proxy $\hat s$ instead of need is the
 Every function answers one part of a single question — *how much* need is left behind, *of whom*, *compared to what*, and *with what certainty*. All support weights and carry a confidence interval (or a docstring saying why not).
 
 ```mermaid
+%%{init: {'theme':'base','themeVariables':{'primaryColor':'#eef3f8','primaryBorderColor':'#8fa8c8','primaryTextColor':'#152536','lineColor':'#9aa1a9'}}}%%
 flowchart LR
     S["scores<br/>a deployed model's output"] --> AUD(["riskaudit.audit"])
     N["need<br/>independent measure"] --> AUD
@@ -88,6 +89,8 @@ flowchart LR
     AUD --> G["of whom? group_capture"]
     AUD --> L["which label? reclassification and frontier"]
     AUD --> U["how certain? design-based CI and label_robustness"]
+    classDef tool fill:#dfeaf5,stroke:#4C78A8,color:#173a5e;
+    class AUD tool
 ```
 
 | | Function | Question it answers |
@@ -134,9 +137,16 @@ Three worked examples, from a controlled check to real survey microdata:
 **Case study — MEPS 2021–2023.** On ~3,001 adults with valid K6 distress scores in both panel years, the spend model captures only ~15% of top-decile need — barely above the ~10% floor, far below the ~41% oracle; a need-trained model reaches ~29%. Among the people the spend model deprioritizes, those in distress run up more *total* future cost than it predicted (incremental lift +0.8 log-dollars with the mental-health features, +1.0 without — both 95% CIs exclude zero): the bias is in the **label, not in missing information**.
 
 <p align="center">
+  <img src="https://raw.githubusercontent.com/CProromant/risk-equity-audit/main/docs/img/capture.png" width="680"
+       alt="Top-decile capture of measured need on MEPS: oracle 41 percent, need-trained model 29 percent, spend-trained model 15 percent, random floor 10 percent.">
+</p>
+
+<p align="center">
   <img src="https://raw.githubusercontent.com/CProromant/risk-equity-audit/main/docs/img/label_choice_curve.png" width="620"
        alt="Label-choice curve: the need-trained model's mean need rises steeply with its score percentile; the spend-trained model's is much shallower.">
 </p>
+
+<sub>Left/top: the spend model captures 15% of top-decile need — barely above the 10% random floor, far below the 41% oracle. Right/bottom: where the highest-need people land on each model's score. Both are <code>riskaudit</code>'s own output.</sub>
 
 **Honest limit.** That excess does **not** appear on non-psychiatric utilization (ER + hospitalizations; lift ≈ 0, CI includes zero), so I do *not* claim the distress surfaces specifically as non-psychiatric spending — a clean test needs a non-psychiatric spend target (backlog). Full reasoning is in [`examples/meps/METHODS.md`](examples/meps/METHODS.md).
 
@@ -184,12 +194,23 @@ Machine-readable metadata is in [`CITATION.cff`](CITATION.cff).
 
 `riskaudit` es una librería de Python, pequeña y de dependencias livianas, que mide el **sesgo por elección de la etiqueta**: cuánta *necesidad* real deja fuera un modelo de riesgo cuando se entrena con un proxy cómodo (típicamente el **gasto sanitario**) en lugar de la necesidad misma. Es un *auditor*, no un modelo: no entrena ni predice. Le das los `scores` que un modelo desplegado ya produjo, una medida independiente de `need` (necesidad) y `weights` poblacionales, y cuantifica la necesidad dejada atrás — ponderada, con IC de diseño, leída contra un piso al azar y un oráculo.
 
-<p align="center">
-  <img src="https://raw.githubusercontent.com/CProromant/risk-equity-audit/main/docs/img/capture.png" width="720"
-       alt="Captura de necesidad medida en el top-decil (MEPS): oráculo 41 por ciento, modelo de necesidad 29 por ciento, modelo de gasto 15 por ciento, piso al azar 10 por ciento.">
-</p>
+```mermaid
+%%{init: {'theme':'base','themeVariables':{'primaryColor':'#eef3f8','primaryBorderColor':'#8fa8c8','primaryTextColor':'#152536','lineColor':'#9aa1a9'}}}%%
+flowchart TD
+    N["Personas con necesidad real"] --> Q{"¿Consultan?"}
+    Q -->|sí| V["Gasto registrado — visible al modelo"]
+    Q -->|no| H["Gasto casi cero — invisible"]
+    V --> HI["rankeadas de alto riesgo"]
+    H --> LO["rankeadas de bajo riesgo — la necesidad se perdió"]
+    LO --> B["Sesgo por elección de etiqueta: la necesidad que el modelo deja atrás"]
+    B --> R["riskaudit mide la brecha: captura vs. piso y oráculo"]
+    classDef bias fill:#fbe3db,stroke:#E4572E,color:#7a2a14;
+    classDef tool fill:#dfeaf5,stroke:#4C78A8,color:#173a5e;
+    class B bias
+    class R tool
+```
 
-<p align="center"><sub>Salida de la propia <code>riskaudit</code> sobre el ejemplo MEPS: un modelo desplegado entrenado con gasto captura la necesidad apenas por encima del azar — y menos de la mitad de lo que capturaría rankeando por necesidad.</sub></p>
+<sub>Cómo surge el sesgo por elección de etiqueta — y dónde lo mide <code>riskaudit</code>. Un mapa conceptual, no un gráfico de datos; los números están en <a href="#evidencia">Evidencia</a>.</sub>
 
 ## Instalación
 
@@ -217,18 +238,7 @@ print(f"captura top-decil: {c.value:.0%}  (piso {c.baseline:.0%}, oráculo {c.or
 
 ## Qué mide
 
-Los sistemas de salud tienen presupuesto limitado, así que un modelo decide **a quién se prioriza** — normalmente prediciendo quién "va a gastar más", porque el gasto está registrado para todos. Esa elección tiene un punto ciego: alguien con distrés que **no consulta** tiene gasto casi cero, así que el modelo lo etiqueta como bajo riesgo y nunca lo mira. La necesidad estaba; la *etiqueta* nunca la buscó. Esto es el **sesgo por elección de la etiqueta** (Obermeyer et al., 2019).
-
-```mermaid
-flowchart TD
-    N["Personas con necesidad real"] --> Q{"¿Consultan?"}
-    Q -->|sí| V["Gasto registrado — visible al modelo"]
-    Q -->|no| H["Gasto casi cero — invisible"]
-    V --> HI["rankeadas de alto riesgo"]
-    H --> LO["rankeadas de bajo riesgo — la necesidad se perdió"]
-    LO --> B["Sesgo por elección de etiqueta: necesidad que el modelo deja atrás"]
-    B --> R["riskaudit mide la brecha: captura vs. piso y oráculo"]
-```
+Los sistemas de salud tienen presupuesto limitado, así que un modelo decide **a quién se prioriza** — normalmente prediciendo quién "va a gastar más", porque el gasto está registrado para todos. Esa elección tiene un punto ciego: alguien con distrés que **no consulta** tiene gasto casi cero, así que el modelo lo etiqueta como bajo riesgo y nunca lo mira. La necesidad estaba; la *etiqueta* nunca la buscó. Esto es el **sesgo por elección de la etiqueta** (Obermeyer et al., 2019) — el mecanismo esquematizado al inicio de esta página.
 
 Para un score $s$, una medida independiente de necesidad $n$ y pesos $w$, la **captura** top-$k$ es la fracción ponderada de toda la necesidad que cae en el grupo de mayor score que concentra una fracción $k$ de la población:
 
@@ -241,6 +251,7 @@ Un número de captura no significa nada solo, así que se lee contra dos anclas:
 Cada función responde una parte de una sola pregunta — *cuánta* necesidad queda fuera, *de quién*, *comparada con qué* y *con qué certeza*. Todas soportan pesos y traen IC (o un docstring que dice por qué no).
 
 ```mermaid
+%%{init: {'theme':'base','themeVariables':{'primaryColor':'#eef3f8','primaryBorderColor':'#8fa8c8','primaryTextColor':'#152536','lineColor':'#9aa1a9'}}}%%
 flowchart LR
     S["scores<br/>salida de un modelo desplegado"] --> AUD(["riskaudit.audit"])
     N["need<br/>medida independiente"] --> AUD
@@ -249,6 +260,8 @@ flowchart LR
     AUD --> G["¿de quién? group_capture"]
     AUD --> L["¿qué etiqueta? reclassification y frontier"]
     AUD --> U["¿qué certeza? IC de diseño y label_robustness"]
+    classDef tool fill:#dfeaf5,stroke:#4C78A8,color:#173a5e;
+    class AUD tool
 ```
 
 | | Función | Pregunta que responde |
@@ -293,6 +306,18 @@ Tres ejemplos, del control sintético a los microdatos reales de encuesta:
 **Validación — Obermeyer et al. (2019).** Solo con el API sobre los [datos públicos](https://gitlab.com/labsysmed/dissecting-bias): el score de costo deja fuera la necesidad de salud (captura top-3% de condiciones crónicas 0.12 vs. oráculo 0.19) y captura menos la de pacientes negros (0.10) que blancos (0.12); re-rankear por salud sube su participación en el tramo auto-enroll (20.0% → 23.3%) y rota el 64% de la lista. Las direcciones coinciden con el paper; las magnitudes están atenuadas por ser dato sintético — **documentado, no maquillado**, en [`validation/obermeyer_2019/COVERAGE.md`](validation/obermeyer_2019/COVERAGE.md).
 
 **Caso — MEPS 2021–2023.** Sobre ~3.001 adultos con K6 válido en ambos años del panel, el modelo de gasto captura solo ~15% de la necesidad del top-decil — apenas sobre el ~10% del azar, muy por debajo del ~41% del oráculo; un modelo de necesidad llega a ~29%. Entre los deprioritizados, los que están en distrés acumulan más gasto *total* futuro del predicho (lift +0.8 log-dólares con las features de salud mental, +1.0 sin ellas — ambos IC 95% excluyen el cero): el sesgo está en la **etiqueta, no en falta de información**.
+
+<p align="center">
+  <img src="https://raw.githubusercontent.com/CProromant/risk-equity-audit/main/docs/img/capture.png" width="680"
+       alt="Captura de necesidad medida en el top-decil (MEPS): oráculo 41 por ciento, modelo de necesidad 29 por ciento, modelo de gasto 15 por ciento, piso al azar 10 por ciento.">
+</p>
+
+<p align="center">
+  <img src="https://raw.githubusercontent.com/CProromant/risk-equity-audit/main/docs/img/label_choice_curve.png" width="620"
+       alt="Curva label-choice: la necesidad media del modelo de necesidad sube empinada con su percentil de score; la del modelo de gasto es mucho más superficial.">
+</p>
+
+<sub>Arriba: el modelo de gasto captura 15% de la necesidad del top-decil — apenas sobre el piso al azar de 10%, muy por debajo del oráculo de 41%. Abajo: dónde caen las personas de mayor necesidad en el score de cada modelo. Ambas son salida de la propia <code>riskaudit</code>.</sub>
 
 **Límite honesto.** Ese exceso **no** aparece en la utilización no-psiquiátrica (urgencias + hospitalizaciones; lift ≈ 0, IC incluye el cero), así que **no** afirmo que el distrés se manifieste como gasto no psiquiátrico — un test limpio necesita un target de gasto no-psiquiátrico (backlog). Razonamiento completo en [`examples/meps/METHODS.md`](examples/meps/METHODS.md).
 
