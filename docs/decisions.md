@@ -141,6 +141,25 @@ Se usa el conteo de condiciones crónicas activas (`gagne_sum_t`) como `need` �
 salud que el paper argumenta que el algoritmo debería seguir. `scores` = `risk_score_t` (el
 score de costo desplegado). Tramo = top-3% (umbral p97 de auto-enroll del paper).
 
+## 2026-07-21 — v0.2: limpieza de pulcritud
+
+Barrido y reordenamiento tras la reestructura de ejemplos:
+
+- **Eliminado:** dir fantasma `src/riskaudit/chile/`, `SYNTHETIC_DIR` + `data/synthetic/`
+  (sin uso), línea muerta del `.gitignore`; `_rank01` deduplicado a `audit/_common`.
+- **Tests junto a su código:** los de ejemplos se movieron a `examples/*/tests` y
+  `validation/*/tests`; `tests/` queda solo con la librería; `testpaths` los recoge.
+- **Docs:** `docs/methods.md` → `examples/meps/METHODS.md` (es metodología del caso MEPS);
+  nuevo `examples/meps/README.md`. La matemática de la librería vive en los docstrings.
+- **Estructura/config:** I/O de MEPS autocontenido bajo `examples/meps/{data,artifacts}`
+  (antes en la raíz); `.gitignore` por extensión; extra `[meps]` → `[examples]`; árbol
+  del PROTOCOL §2 actualizado.
+
+**Nota operativa (error):** al mudar el I/O, un `rm -rf data` borró el `data/` de la raíz,
+que tenía microdatos MEPS ya descargados localmente (git-ignored, no versionados). Son
+regenerables con `make download && make etl` (los checksums se conservan) o restaurables
+desde la papelera de OneDrive.
+
 ## 2026-07-21 — v0.2: reestructura de ejemplos (el core queda solo con la librería)
 
 Desviación del PROTOCOL §2 (estructura). El producto es `riskaudit.audit`; el pipeline MEPS y
