@@ -58,10 +58,16 @@ Because it works purely on scores and a need measure, `riskaudit` is **domain- a
 
 ## Install
 
-> Requires Python ≥ 3.11. Until the first release is published, install from source:
+Requires Python ≥ 3.11.
 
 ```bash
-git clone https://github.com/<user>/risk-equity-audit.git
+pip install riskaudit
+```
+
+The core install is light (numpy, pandas, scikit-learn, matplotlib). For the MEPS example's heavier stack, add the extra: `pip install "riskaudit[meps]"`. For development, install from source:
+
+```bash
+git clone https://github.com/CProromant/risk-equity-audit.git
 cd risk-equity-audit
 pip install -e ".[dev]"
 ```
@@ -187,7 +193,7 @@ Como trabaja solo con puntajes y una medida de necesidad, `riskaudit` es **agnó
 
 ## Instalación y quickstart
 
-Igual que en la sección en inglés (Python ≥ 3.11, `pip install -e ".[dev]"`). El ejemplo mínimo de la API funciona hoy, y un demo auto-contenido muestra el flujo completo: `python demo/run_demo.py` (sin datos reales, sin PHI, segundos).
+`pip install riskaudit` (Python ≥ 3.11). El core es liviano; para el ejemplo MEPS: `pip install "riskaudit[meps]"`. El ejemplo mínimo de la API funciona hoy, y un demo auto-contenido muestra el flujo completo: `python demo/run_demo.py` (sin datos reales, sin PHI, segundos).
 
 ## Limitaciones
 
