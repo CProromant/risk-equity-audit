@@ -20,18 +20,20 @@ NEED = "#4C78A8"  # need-trained model
 SPEND = "#E4572E"  # spend-trained model (the finding)
 REF = "#c9c9c9"  # oracle / floor references
 
-plt.rcParams.update({
-    "font.size": 11,
-    "axes.spines.top": False,
-    "axes.spines.right": False,
-    "axes.grid": True,
-    "grid.alpha": 0.25,
-    "grid.linewidth": 0.6,
-    "savefig.dpi": 150,
-    "savefig.bbox": "tight",
-    "figure.facecolor": "white",
-    "savefig.facecolor": "white",
-})
+plt.rcParams.update(
+    {
+        "font.size": 11,
+        "axes.spines.top": False,
+        "axes.spines.right": False,
+        "axes.grid": True,
+        "grid.alpha": 0.25,
+        "grid.linewidth": 0.6,
+        "savefig.dpi": 150,
+        "savefig.bbox": "tight",
+        "figure.facecolor": "white",
+        "savefig.facecolor": "white",
+    }
+)
 
 
 def _load():
@@ -45,7 +47,10 @@ def capture_bar(fm, preds):
     spend = top_k_capture(preds["spend"], need, weights=w)
     k6 = top_k_capture(preds["k6"], need, weights=w)
     labels = [
-        "Oracle\n(rank by need)", "Need-trained\nmodel", "Spend-trained\nmodel", "Random\n(floor)"
+        "Oracle\n(rank by need)",
+        "Need-trained\nmodel",
+        "Spend-trained\nmodel",
+        "Random\n(floor)",
     ]
     vals = [spend.oracle, k6.value, spend.value, spend.baseline]
     colors = [REF, NEED, SPEND, REF]
@@ -61,10 +66,20 @@ def capture_bar(fm, preds):
         ax.text(v + 0.006, yi, f"{v:.0%}", va="center", fontsize=10.5)
     ax.set_xlabel("Share of top-decile measured need captured")
     fig.subplots_adjust(top=0.80)
-    fig.text(0.02, 0.965, "A spend-trained model captures need barely above chance",
-             fontsize=12.5, weight="bold")
-    fig.text(0.02, 0.885, "MEPS 2021–2023 · top decile · population-weighted, design-based CIs",
-             fontsize=9.5, color="#666")
+    fig.text(
+        0.02,
+        0.965,
+        "A spend-trained model captures need barely above chance",
+        fontsize=12.5,
+        weight="bold",
+    )
+    fig.text(
+        0.02,
+        0.885,
+        "MEPS 2021–2023 · top decile · population-weighted, design-based CIs",
+        fontsize=9.5,
+        color="#666",
+    )
     fig.savefig(IMG / "capture.png")
     plt.close(fig)
 
@@ -83,8 +98,13 @@ def curve(fm, preds):
     ax.legend(frameon=False, loc="upper left")
     fig.subplots_adjust(top=0.80)
     sub = "A model that ranks by need rises steeply; the spend model's is much shallower"
-    fig.text(0.02, 0.965, "Where the highest-need people sit on each model's score",
-             fontsize=12.5, weight="bold")
+    fig.text(
+        0.02,
+        0.965,
+        "Where the highest-need people sit on each model's score",
+        fontsize=12.5,
+        weight="bold",
+    )
     fig.text(0.02, 0.885, sub, fontsize=9.5, color="#666")
     fig.savefig(IMG / "label_choice_curve.png")
     plt.close(fig)
