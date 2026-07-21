@@ -51,7 +51,7 @@ Every result carries a confidence interval (row or design-based) and reads again
 
 Health systems have limited budgets for expensive programs, so a model decides **who gets prioritized** — usually by predicting who will "spend the most," because spending is recorded for everyone. That choice has a blind spot: someone in psychological distress who **does not seek care** has near-zero spending, so a spend-trained model calls them low risk and never looks. The need was there; the *label* never looked for it.
 
-This is **label-choice bias** — an algorithm trained on cost as a proxy for need under-serves people whose need hasn't turned into spending. `riskaudit` measures it, on any model, without retraining.
+This is **label-choice bias** (Obermeyer et al., [2019](https://doi.org/10.1126/science.aax2342)) — an algorithm trained on cost as a proxy for need under-serves people whose need hasn't turned into spending. `riskaudit` measures it, on any model, without retraining.
 
 ## The toolkit
 
@@ -106,6 +106,8 @@ Honesty about limits is a feature of this project, not a footnote:
 
 Machine-readable metadata is in [`CITATION.cff`](CITATION.cff).
 
+The label-choice framing follows Obermeyer, Z., Powers, B., Vogeli, C., & Mullainathan, S. (2019). Dissecting racial bias in an algorithm used to manage the health of populations. *Science*, 366(6464), 447–453. https://doi.org/10.1126/science.aax2342
+
 ## License
 
 [MIT](LICENSE) © Conrado — MD (PUC), MSc(c) Data Science (PUC).
@@ -156,7 +158,7 @@ Cada resultado trae IC (de filas o de diseño) y se lee contra su **piso** (scor
 
 Los sistemas de salud tienen presupuesto limitado, así que un modelo decide **a quién se prioriza** — normalmente prediciendo quién "va a gastar más", porque el gasto está registrado para todos. Esa elección tiene un punto ciego: alguien con distrés que **no consulta** tiene gasto casi cero, así que un modelo entrenado con gasto lo etiqueta como bajo riesgo y nunca lo mira. La necesidad estaba; la *etiqueta* nunca la buscó.
 
-Esto es el **sesgo por elección de la etiqueta**: un algoritmo entrenado con el costo como proxy de necesidad sub-atiende a quienes su necesidad aún no se tradujo en gasto. `riskaudit` lo mide, sobre cualquier modelo, sin reentrenar.
+Esto es el **sesgo por elección de la etiqueta** (Obermeyer et al., [2019](https://doi.org/10.1126/science.aax2342)): un algoritmo entrenado con el costo como proxy de necesidad sub-atiende a quienes su necesidad aún no se tradujo en gasto. `riskaudit` lo mide, sobre cualquier modelo, sin reentrenar.
 
 ## La herramienta
 
@@ -193,6 +195,10 @@ La honestidad sobre los límites es parte del proyecto, no una nota al pie:
 - **El subgrupo severo no tratado es pequeño** (~40 en la muestra analítica): descriptivo, con IC anchos, nunca se modela. El hallazgo robusto es el mecanismo poblacional, no la anécdota de "los invisibles".
 - **"Necesidad" es una elección normativa** — se declara y defiende en [`docs/methods.md`](docs/methods.md); `label_robustness` la somete a estrés.
 - **El diseño muestral se respeta siempre:** pesos y bootstrap de clúster estratificado sobre VARSTR/VARPSU, nunca sin ponderar.
+
+## Referencia
+
+El encuadre de *label-choice bias* sigue a Obermeyer, Z., Powers, B., Vogeli, C., & Mullainathan, S. (2019). Dissecting racial bias in an algorithm used to manage the health of populations. *Science*, 366(6464), 447–453. https://doi.org/10.1126/science.aax2342
 
 ## Licencia
 
