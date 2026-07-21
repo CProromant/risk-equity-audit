@@ -96,7 +96,7 @@ make validate-obermeyer   # downloads ~18 MB (pinned by SHA-256), prints the tab
 No data is stored in this repository. Only download scripts and checksums are versioned; everything under `data/` is git-ignored.
 
 - **MEPS (AHRQ, U.S.):** HC-233/243/251 (FYC 2021–2023), **HC-244** (Panel 26 longitudinal), **HC-231** (Conditions) and **HC-229A** (Prescribed Medicines) for the treatment proxy — free, no registration, downloaded with SHA-256 checksums. See [`PROTOCOL.md`](PROTOCOL.md) §3.
-- **Synthetic (demo):** generated in-script by `demo/run_demo.py` — no external data, no real patients.
+- **Synthetic (benchmark):** generated in-script by [`examples/benchmark`](examples/benchmark/) — a controlled example that plants a known bias, no external data, no real patients.
 
 ## Limitations
 

@@ -1,5 +1,5 @@
 # Windows: run these under Git Bash, or invoke the underlying scripts directly.
-.PHONY: download etl models audit demo all test lint format validate-obermeyer
+.PHONY: download etl models audit benchmark all test lint format validate-obermeyer
 
 all: download etl models audit
 
@@ -15,8 +15,8 @@ models:
 audit:
 	python scripts/run_audit.py
 
-demo:
-	python demo/run_demo.py
+benchmark:
+	python examples/benchmark/run_benchmark.py
 
 test:
 	pytest
