@@ -11,6 +11,9 @@ demo_report.html
 !data/**/.gitkeep
 !data/checksums.txt
 
+# Validation datasets (Obermeyer synthetic) — downloaded on demand, pinned by SHA-256
+validation/**/data/
+
 # Python
 __pycache__/
 *.py[cod]

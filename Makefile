@@ -1,5 +1,5 @@
 # Windows: run these under Git Bash, or invoke the underlying scripts directly.
-.PHONY: download etl models audit demo all test lint format
+.PHONY: download etl models audit demo all test lint format validate-obermeyer
 
 all: download etl models audit
 
@@ -26,3 +26,7 @@ lint:
 
 format:
 	ruff format .
+
+validate-obermeyer:
+	python -m validation.obermeyer_2019.reproduce
+	RISKAUDIT_RUN_VALIDATION=1 python -m pytest -q tests/test_validation_obermeyer.py
