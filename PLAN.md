@@ -327,12 +327,12 @@ Cerrar la deuda de consistencia detectada en la revisión. Barato y desbloquea l
 
 Reproducir las métricas de auditoría del caso canónico sobre su sintético público (`gitlab.com/labsysmed/dissecting-bias`), usando **solo el API**. Convierte "confía en el autor" en "verificable". Detalle en `roadmap-v2.md §A`.
 
-- [ ] `validation/obermeyer_2019/download.py` (checksum SHA-256, git-ignored) + `COVERAGE.md` (resultado por resultado: reproducible / parcial / no).
-- [ ] `obermeyer_2019.ipynb`: solo API público; tabla paper vs. reproducido vs. delta; 2 figuras con `label_choice_curve` / `reclassification`.
-- [ ] Test protegido (`make validate-obermeyer`, activable con `RISKAUDIT_RUN_VALIDATION=1`).
-- [ ] Sección "Validation" bilingüe en README (≤10 líneas por idioma).
-- **AC:** un tercero corre un comando y ve la tabla de reproducción en <15 min, sin credenciales.
-- **Regla dura:** si un resultado no reproduce dentro de tolerancia, se documenta la discrepancia con hipótesis de causa — **no** se ajusta la tolerancia.
+- [x] `validation/obermeyer_2019/download.py` (checksum SHA-256, git-ignored) + `COVERAGE.md` (resultado por resultado).
+- [x] `reproduce.py` (script, no notebook — ver `decisions.md`): solo API público; tabla paper vs. reproducido. Figuras PNG → backlog.
+- [x] Test protegido (`make validate-obermeyer`, activable con `RISKAUDIT_RUN_VALIDATION=1`); asegura direcciones, no magnitudes.
+- [x] Sección "Validation" bilingüe en README.
+- **AC ✅:** `make validate-obermeyer` baja ~18 MB, imprime la tabla y la verifica en <15 min, sin credenciales.
+- **Regla dura aplicada:** direcciones reproducen; magnitud atenuada (sintético) documentada en `COVERAGE.md`, no se ajustó tolerancia.
 
 ## v0.2 · Fase B — Expansión del API (equidad + decisión)
 
@@ -352,7 +352,7 @@ Una función por sesión: investigar → firma + AC → implementar contra el AP
 ## Checklist maestro v0.2 (una vista)
 
 - [x] Fase 0: versión única · `CITATION` al día · `py.typed` · cobertura ~99% · docs consistentes · checklist de release
-- [ ] Fase A: validación Obermeyer reproducible en <15 min
+- [x] Fase A: validación Obermeyer reproducible en <15 min
 - [ ] Fase B: `group_capture` · `label_blend_frontier`
 - [ ] Release v0.2.0 publicado · CI verde
 

@@ -117,3 +117,26 @@ Una revisión externa encontró bugs que fabricaban o sobre-afirmaban hallazgos.
 - **Determinismo (N2):** LightGBM `deterministic=True, force_row_wise=True`.
 - **Validación (C3/N1):** las funciones públicas exigen finitos y misma longitud; `run_audit` re-indexa por etiqueta.
 - **Docs (D1/D2):** estado único; n del subgrupo severo = 40 (analítico) / 63 (panel); borrado el "45" muerto.
+
+## 2026-07-21 — v0.2 Fase A (validación Obermeyer 2019)
+
+### Script en vez de notebook; tabla de texto en vez de PNG
+El PLAN/roadmap pedían `obermeyer_2019.ipynb` con 2 figuras. Uso
+`validation/obermeyer_2019/reproduce.py` (ejecutable con `make validate-obermeyer` o
+`python -m ...`): un script es diffeable, testeable y sin dependencias de nbconvert, fiel al
+idiom del repo ("scripts de arriba a abajo"). El artefacto de reproducción es una **tabla
+impresa** (paper real vs. sintético) más la tabla de `COVERAGE.md`; las figuras PNG quedan en
+backlog — no aportan al AC ("un comando, tabla en <15 min").
+
+### Discrepancia de magnitud (regla dura: se documenta, no se ajusta)
+Sobre el sintético público las **direcciones reproducen** (captura < oráculo; captura negros <
+blancos; a igual tramo, negros más enfermos 6.62 vs 5.21; share negro cost→health 20.0%→23.3%;
+64% de rotación de la lista), pero las **magnitudes están atenuadas** frente al paper real
+(share 17.7%→46.5%). Causa: el dataset es sintético, con señal racial más débil (11.4% negros;
+el score de costo ya correlaciona con enfermedad). El test protegido asegura **solo
+direcciones**, no magnitudes. Detalle en `validation/obermeyer_2019/COVERAGE.md`.
+
+### `gagne_sum_t` como medida de necesidad
+Se usa el conteo de condiciones crónicas activas (`gagne_sum_t`) como `need` — la medida de
+salud que el paper argumenta que el algoritmo debería seguir. `scores` = `risk_score_t` (el
+score de costo desplegado). Tramo = top-3% (umbral p97 de auto-enroll del paper).

@@ -81,6 +81,14 @@ A worked example on U.S. MEPS 2021–2023 shows the tool finds real bias — a d
 
 **Honest limit.** That excess does **not** appear on non-psychiatric utilization (ER + hospitalizations; lift ≈ 0, CI includes zero), so I do *not* claim the distress surfaces specifically as non-psychiatric spending — the total-spend excess may be partly mental-health spending, and a clean test needs a non-psychiatric spend target (backlog). The severe-untreated subgroup (n ≈ 40) is descriptive only. The figures regenerate from the pipeline with `python docs/make_figures.py`.
 
+## Validation
+
+`riskaudit`'s metrics reproduce the canonical label-choice audit — Obermeyer et al. ([2019](https://doi.org/10.1126/science.aax2342)) — on the authors' [public synthetic data](https://gitlab.com/labsysmed/dissecting-bias), using only the public API. Ranking by the deployed cost-score leaves health need behind (top-3% capture of active chronic conditions 0.12 vs. a 0.19 oracle) and captures less of it for Black patients (0.10) than White (0.12); re-ranking by health raises the Black share of the auto-enroll tier (20.0% → 23.3%) and turns over 64% of the list. Directions match the paper; magnitudes are attenuated because the data is synthetic — documented, not tuned away, in [`validation/obermeyer_2019/COVERAGE.md`](validation/obermeyer_2019/COVERAGE.md).
+
+```bash
+make validate-obermeyer   # downloads ~18 MB (pinned by SHA-256), prints the table, checks it
+```
+
 ## Data sources
 
 No data is stored in this repository. Only download scripts and checksums are versioned; everything under `data/` is git-ignored.
@@ -187,6 +195,14 @@ Un ejemplo sobre MEPS 2021–2023 (EE.UU.) muestra que la herramienta encuentra 
 **Hallazgos** (ponderado, IC de diseño): el modelo de gasto captura solo ~15% de la necesidad K6 del top-decil — apenas sobre el ~10% del azar, muy por debajo del ~41% del oráculo; un modelo de K6 llega a ~29%. Entre los deprioritizados por el modelo de gasto, los que están en distrés acumulan más gasto *total* futuro del predicho (lift +0.8 log-dólares con las features de salud mental, +1.0 sin ellas — ambos IC 95% excluyen el cero): el sesgo viene de la **etiqueta, no de falta de información**.
 
 **Límite honesto.** Ese exceso **no** aparece en la utilización no-psiquiátrica (urgencias + hospitalizaciones; lift ≈ 0, IC incluye el cero), así que **no** afirmo que el distrés se manifieste específicamente como gasto no psiquiátrico — un test limpio necesita un target de gasto no-psiquiátrico (backlog). El subgrupo severo no tratado (n ≈ 40) es solo descriptivo.
+
+## Validación
+
+Las métricas de `riskaudit` reproducen la auditoría de label-choice más citada — Obermeyer et al. ([2019](https://doi.org/10.1126/science.aax2342)) — sobre los [datos sintéticos públicos](https://gitlab.com/labsysmed/dissecting-bias) de los autores, usando solo el API público. Rankear por el score de costo desplegado deja fuera la necesidad de salud (captura top-3% de condiciones crónicas 0.12 vs. oráculo 0.19) y captura menos la de pacientes negros (0.10) que blancos (0.12); re-rankear por salud sube su participación en el tramo auto-enroll (20.0% → 23.3%) y rota el 64% de la lista. Las direcciones coinciden con el paper; las magnitudes están atenuadas porque el dato es sintético — documentado, no maquillado, en [`validation/obermeyer_2019/COVERAGE.md`](validation/obermeyer_2019/COVERAGE.md).
+
+```bash
+make validate-obermeyer   # baja ~18 MB (fijado por SHA-256), imprime la tabla y la verifica
+```
 
 ## Limitaciones
 
