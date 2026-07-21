@@ -1,15 +1,11 @@
-# Data and artifacts are never versioned (PROTOCOL §1, guardrail 5)
-data/
-artifacts/
+# Microdata and artifacts are never versioned (PROTOCOL §1, guardrail 5).
+# Covered by extension so it holds wherever an example writes; the checksum
+# manifest and empty .gitkeep markers don't match here, so they stay tracked.
 *.dta
 *.zip
 *.parquet
+artifacts/
 benchmark_report.html
-
-# Keep the data tree and the checksum manifest
-!data/
-!data/**/.gitkeep
-!data/checksums.txt
 
 # Validation datasets (Obermeyer synthetic) — downloaded on demand, pinned by SHA-256
 validation/**/data/

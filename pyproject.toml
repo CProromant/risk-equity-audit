@@ -28,8 +28,9 @@ classifiers = [
     "Programming Language :: Python :: 3.12",
     "Topic :: Scientific/Engineering",
 ]
-# Core is light — the auditor only needs these. The MEPS example (etl/models)
-# pulls the heavy stack via the `meps` extra.
+# Core is light — the auditor only needs these. Running the bundled examples
+# (the MEPS pipeline, the Obermeyer download) needs the heavier `examples` stack;
+# it is not shipped in the wheel.
 dependencies = [
     "numpy",
     "pandas",
@@ -38,8 +39,8 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
-meps = ["pyarrow", "pyreadstat", "lightgbm", "shap", "pyyaml", "requests"]
-dev = ["riskaudit[meps]", "pytest", "pytest-cov", "ruff", "pre-commit"]
+examples = ["pyarrow", "pyreadstat", "lightgbm", "shap", "pyyaml", "requests"]
+dev = ["riskaudit[examples]", "pytest", "pytest-cov", "ruff", "pre-commit"]
 
 [project.urls]
 Homepage = "https://github.com/CProromant/risk-equity-audit"

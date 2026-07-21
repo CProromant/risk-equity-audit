@@ -49,42 +49,26 @@
 ## 2. Estructura del repositorio
 
 ```
+# Estructura vigente (v0.2). El build v0.1 vivía como un solo paquete; hoy la
+# librería y los ejemplos están separados.
 risk-equity-audit/
-├── CLAUDE.md
-├── PROTOCOL.md                # este documento
-├── README.md                  # bilingüe: EN, luego ES
-├── LICENSE
-├── pyproject.toml
-├── Makefile                   # download / etl / models / audit / demo / all / test
-├── .gitignore                 # data/, artifacts/, *.dta, *.zip, *.parquet
-├── .github/workflows/ci.yml
-├── src/riskaudit/
-│   ├── __init__.py
-│   ├── etl/
-│   │   ├── download.py        # descarga MEPS con verificación de checksum
-│   │   ├── meps.py            # lectura, renombrado, panel t→t+1
-│   │   └── dictionary.yml     # variable → archivo → página del codebook (VERIFICADO)
-│   ├── features.py            # matriz X_t y los tres targets t+1
-│   ├── models.py              # entrenamiento idéntico por target
-│   └── audit/                 # ← EL PAQUETE PÚBLICO
-│       ├── capture.py
-│       ├── reclassification.py
-│       ├── ablation.py
-│       ├── curves.py          # label_choice_curve
-│       ├── lift.py            # incremental_lift (métrica-contribución)
-│       ├── rtm.py             # regresión a la media
-│       └── report.py          # informe HTML autocontenido
-├── scripts/                   # entrypoints finos que llaman al paquete
-├── demo/
-│   ├── run_demo.py            # Synthea → modelo de costo → auditoría → HTML
-│   └── README.md
-├── tests/
-├── docs/
-│   ├── methods.md             # definiciones matemáticas y decisiones estadísticas
-│   └── decisions.md           # registro de desviaciones respecto a este protocolo
-├── data/                      # NO versionado
-│   ├── raw/ processed/ synthetic/
-└── artifacts/                 # modelos, predicciones, figuras (NO versionado)
+├── CLAUDE.md · PROTOCOL.md · PLAN.md      # spec + plan (layout vigente: aquí y §9)
+├── README.md · LICENSE · CITATION.cff · CHANGELOG.md
+├── pyproject.toml · Makefile · conftest.py · .pre-commit-config.yaml
+├── .github/workflows/                     # ci.yml, publish.yml
+├── src/riskaudit/                         # LA LIBRERÍA — lo único que va en el wheel
+│   ├── __init__.py · _config.py · py.typed
+│   └── audit/                             # capture · reclassification · curves · ablation
+│       └── …                              # rtm · lift · robustness · groups · frontier · report
+├── tests/                                 # tests de la librería
+├── examples/
+│   ├── benchmark/                         # sintético controlado (sesgo plantado conocido)
+│   └── meps/                              # ejemplo MEPS 2021–2023 (paquete `meps`)
+│       ├── etl/ · features.py · models.py · scripts/ · make_figures.py
+│       ├── METHODS.md · README.md · tests/
+│       └── data/ · artifacts/             # NO versionado (solo checksums.txt + .gitkeep)
+├── validation/obermeyer_2019/             # reproducción del caso canónico (+ sus tests)
+└── docs/                                  # decisions.md · roadmap-v2.md · img/
 ```
 
 ---
@@ -262,6 +246,6 @@ Después, autorizar fase por fase. Para la Fase 1, recordarle el guardrail 1 (ve
 
 Del **backlog §7** (fairlearn, CLI, mkdocs, preprint) nada entra en v0.2: sigue diferido. v0.2 es solo validación + equidad.
 
-**Estructura actual (reemplaza al árbol §2, que queda como registro v0.1).** `src/riskaudit/` es *solo* la librería (`audit/`, `_config.SEED`, `py.typed`); el wheel no incluye el pipeline. Los ejemplos viven fuera del paquete: `examples/benchmark/` (sintético controlado con respuesta conocida), `examples/meps/` (pipeline MEPS real, paquete `meps`, corrido con `PYTHONPATH=examples`), y `validation/obermeyer_2019/`. Detalle en `docs/decisions.md` (2026-07-21).
+**Estructura actual (ver también el árbol §2, ya actualizado).** `src/riskaudit/` es *solo* la librería (`audit/`, `_config.SEED`, `py.typed`); el wheel no incluye el pipeline. Los ejemplos viven fuera del paquete: `examples/benchmark/` (sintético controlado con respuesta conocida), `examples/meps/` (pipeline MEPS real, paquete `meps`, corrido con `PYTHONPATH=examples`), y `validation/obermeyer_2019/`. Detalle en `docs/decisions.md` (2026-07-21).
 
 **Guardrails que siguen vigentes:** pesos y varianza de diseño siempre (guardrail 3); honestidad sobre límites (el nulo no-psiquiátrico se reporta, no se esconde); nombres MEPS verificados contra codebook (guardrail 1); nada de datos en git (guardrail 5); cobertura de `riskaudit.audit` ≥ 90%.
