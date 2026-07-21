@@ -10,6 +10,7 @@ from riskaudit.audit import (
     audit_report,
     incremental_lift,
     label_choice_curve,
+    label_robustness,
     reclassification,
     regression_to_mean,
     top_k_capture,
@@ -172,6 +173,8 @@ def test_audit_report_renders_every_result_type(tmp_path):
             [1.0, 2, 3, 4],
             {"g": ["a"]},
         ),
+        "robust_gap": label_robustness([4, 3, 2, 1], [0, 0, 0, 1], k=0.5),
+        "robust_clean": label_robustness([1, 2, 3, 4], [1, 2, 3, 4], k=0.5),
         "note": "plain text",
     }
     out = audit_report(results, tmp_path / "r.html")
@@ -180,3 +183,4 @@ def test_audit_report_renders_every_result_type(tmp_path):
     assert "capture" in html and "<table" in html and "data:image/png" in html
     assert "RTM share" in html and "global Δ" in html and "plain text" in html
     assert "incremental lift" in html
+    assert "half-gap breakdown at ε" in html and "beyond the grid" in html
