@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "riskaudit"
-version = "0.1.2"
+dynamic = ["version"]
 description = "Audit any risk-stratification model for label-choice bias — how much real need it leaves behind"
 readme = "README.md"
 requires-python = ">=3.11"
@@ -45,6 +45,9 @@ dev = ["riskaudit[meps]", "pytest", "pytest-cov", "ruff", "pre-commit"]
 Homepage = "https://github.com/CProromant/risk-equity-audit"
 Repository = "https://github.com/CProromant/risk-equity-audit"
 Changelog = "https://github.com/CProromant/risk-equity-audit/blob/main/CHANGELOG.md"
+
+[tool.hatch.version]
+path = "src/riskaudit/__init__.py"
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/riskaudit"]

@@ -1,4 +1,5 @@
 import importlib
+from importlib.metadata import version
 
 import pytest
 
@@ -9,8 +10,8 @@ def test_seed_is_frozen():
     assert SEED == 2026
 
 
-def test_version():
-    assert __version__ == "0.1.2"
+def test_version_is_single_sourced():
+    assert __version__ == version("riskaudit")
 
 
 @pytest.mark.parametrize("name", ["riskaudit.audit", "riskaudit.etl"])
