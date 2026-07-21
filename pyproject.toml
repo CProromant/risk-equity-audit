@@ -4,35 +4,47 @@ build-backend = "hatchling.build"
 
 [project]
 name = "riskaudit"
-version = "0.1.0"
-description = "Label-choice bias audit for healthcare risk-stratification models"
+version = "0.1.1"
+description = "Audit any risk-stratification model for label-choice bias — how much real need it leaves behind"
 readme = "README.md"
 requires-python = ">=3.11"
 license = { text = "MIT" }
-authors = [{ name = "Conrado" }]
+authors = [{ name = "Conrado Proromant" }]
 keywords = [
     "algorithmic-fairness",
     "health-equity",
     "risk-stratification",
     "label-choice-bias",
-    "meps",
+    "auditing",
 ]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Science/Research",
+    "Intended Audience :: Healthcare Industry",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Scientific/Engineering",
+]
+# Core is light — the auditor only needs these. The MEPS example (etl/models)
+# pulls the heavy stack via the `meps` extra.
 dependencies = [
     "numpy",
-    "scipy",
     "pandas",
-    "pyarrow",
-    "pyreadstat",
-    "lightgbm",
     "scikit-learn",
-    "shap",
-    "pyyaml",
-    "requests",
     "matplotlib",
 ]
 
 [project.optional-dependencies]
-dev = ["pytest", "pytest-cov", "ruff", "pre-commit"]
+meps = ["pyarrow", "pyreadstat", "lightgbm", "shap", "pyyaml", "requests"]
+dev = ["riskaudit[meps]", "pytest", "pytest-cov", "ruff", "pre-commit"]
+
+[project.urls]
+Homepage = "https://github.com/CProromant/risk-equity-audit"
+Repository = "https://github.com/CProromant/risk-equity-audit"
+Changelog = "https://github.com/CProromant/risk-equity-audit/blob/main/CHANGELOG.md"
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/riskaudit"]

@@ -10,7 +10,7 @@ def test_seed_is_frozen():
 
 
 def test_version():
-    assert __version__ == "0.1.0"
+    assert __version__ == "0.1.1"
 
 
 @pytest.mark.parametrize("name", ["riskaudit.audit", "riskaudit.etl"])

@@ -1,5 +1,13 @@
 # Changelog
 
+## v0.1.1 — 2026-07-19
+
+- Published to PyPI: `pip install riskaudit`.
+- **Split dependencies:** the core auditor needs only `numpy`, `pandas`,
+  `scikit-learn`, `matplotlib`; the MEPS example's heavy stack (`lightgbm`, `shap`,
+  `pyreadstat`, …) moves to the `[meps]` extra.
+- PyPI packaging metadata (classifiers, project URLs).
+
 ## v0.1.0 — 2026-07-19
 
 First release. The product is the **`riskaudit` auditing library**; the MEPS study
