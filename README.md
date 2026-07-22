@@ -10,21 +10,6 @@
 [![DOI](https://img.shields.io/badge/DOI-10.5281%2Fzenodo.21461268-blue)](https://doi.org/10.5281/zenodo.21461268)
 ![license](https://img.shields.io/badge/license-MIT-green)
 
-```mermaid
-%%{init: {'theme':'base','themeVariables':{'primaryColor':'#eef3f8','primaryBorderColor':'#8fa8c8','primaryTextColor':'#152536','lineColor':'#9aa1a9'}}}%%
-flowchart TD
-    N["People with real need"] --> Q{"Seek care?"}
-    Q -->|yes| V["Spending recorded — visible to the model"]
-    Q -->|no| H["Near-zero spending — invisible"]
-    V --> HI["ranked high-risk"]
-    H --> LO["ranked low-risk — the need was missed"]
-    LO --> B["Label-choice bias: the need the model leaves behind"]
-    B --> R["riskaudit measures the gap: capture vs. floor and oracle"]
-    classDef bias fill:#fbe3db,stroke:#E4572E,color:#7a2a14;
-    classDef tool fill:#dfeaf5,stroke:#4C78A8,color:#173a5e;
-    class B bias
-    class R tool
-```
 
 <sub>How label-choice bias arises — and where <code>riskaudit</code> measures it. A concept map, not a data chart; the numbers are in <a href="#evidence">Evidence</a>.</sub>
 
@@ -194,21 +179,6 @@ Machine-readable metadata is in [`CITATION.cff`](CITATION.cff).
 
 `riskaudit` es una librería de Python, pequeña y de dependencias livianas, que mide el **sesgo por elección de la etiqueta**: cuánta *necesidad* real deja fuera un modelo de riesgo cuando se entrena con un proxy cómodo (típicamente el **gasto sanitario**) en lugar de la necesidad misma. Es un *auditor*, no un modelo: no entrena ni predice. Le das los `scores` que un modelo desplegado ya produjo, una medida independiente de `need` (necesidad) y `weights` poblacionales, y cuantifica la necesidad dejada atrás — ponderada, con IC de diseño, leída contra un piso al azar y un oráculo.
 
-```mermaid
-%%{init: {'theme':'base','themeVariables':{'primaryColor':'#eef3f8','primaryBorderColor':'#8fa8c8','primaryTextColor':'#152536','lineColor':'#9aa1a9'}}}%%
-flowchart TD
-    N["Personas con necesidad real"] --> Q{"¿Consultan?"}
-    Q -->|sí| V["Gasto registrado — visible al modelo"]
-    Q -->|no| H["Gasto casi cero — invisible"]
-    V --> HI["rankeadas de alto riesgo"]
-    H --> LO["rankeadas de bajo riesgo — la necesidad se perdió"]
-    LO --> B["Sesgo por elección de etiqueta: la necesidad que el modelo deja atrás"]
-    B --> R["riskaudit mide la brecha: captura vs. piso y oráculo"]
-    classDef bias fill:#fbe3db,stroke:#E4572E,color:#7a2a14;
-    classDef tool fill:#dfeaf5,stroke:#4C78A8,color:#173a5e;
-    class B bias
-    class R tool
-```
 
 <sub>Cómo surge el sesgo por elección de etiqueta — y dónde lo mide <code>riskaudit</code>. Un mapa conceptual, no un gráfico de datos; los números están en <a href="#evidencia">Evidencia</a>.</sub>
 
